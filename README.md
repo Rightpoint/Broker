@@ -57,3 +57,63 @@ private RequestCallback<JSONObject> mRequestCallback = new RequestCallback<JSONO
 
 ```
 
+### Request and Request.Builder
+
+This is the main object that we use to execute our requests. It requires the following:
+1. **UrlProvider**
+2. **RequestExecutor**
+3. A predefined **ResponseType** that matches the **ResponseHandler**'s return type.
+
+Supports:
+1. Custom contentTypes
+2. Adding a body to the request
+3. Url Params
+4. Request headers
+5. Adding metadata to attach to the specific request
+
+
+### UrlProvider
+It enables enums and other classes to provide a url for the request in a standardized fashion.
+
+#### Example
+
+This is an example from Costco, where we define a base url that the other enum objects use in combination with its own defined endpoint. Works very well with REST APIs.
+
+```java
+
+private enum AppUrlProvider implements UrlProvider {
+
+        DEV {
+            @Override
+            public String getUrl() {
+                return "dev/config/appConfig.json";
+            }
+        },
+        LIVE {
+            @Override
+            public String getUrl() {
+                return "live/config/appConfig.json";
+            }
+        };
+
+        @Override
+        public String getBaseUrl() {
+            return "https://mobilecontent.costco.com/";
+        }
+
+        @Override
+        public Request.Method getMethod() {
+            return Request.Method.GET;
+        }
+
+
+    }
+
+```
+
+### RequestExecutor
+
+This the main interface by which a request is executed. Any library that we use for networking, we should create a **Request** executor to plug into this module.
+
+Override the ```execute(Request request)``` method and handle the data that is passed in through the **Request** object.
+
