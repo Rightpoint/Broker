@@ -117,3 +117,31 @@ This the main interface by which a request is executed. Any library that we use 
 
 Override the ```execute(Request request)``` method and handle the data that is passed in through the **Request** object.
 
+### ResponseHandlers
+
+ResponseHandlers define how to convert a response into another. It's ```ResponseType``` should match the **RequestCallback**s type-param. 
+
+#### Example
+
+Example of converting a string into an ```AppConfig``` object. 
+
+```java
+
+private class ParserResponseHandler implements ResponseHandler<String, AppConfig> {
+
+        @Override
+        public AppConfig processResponse(String s) {
+            AppConfig appConfig = null;
+            try {
+                JSONObject appJson = new JSONObject(s);
+                appConfig = parser.parse(AppConfig.class, appJson);
+            } catch (JSONException e) {
+                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
+            } finally {
+                return appConfig;
+            }
+        }
+    }
+
+```
+
