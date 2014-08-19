@@ -111,6 +111,30 @@ private enum AppUrlProvider implements UrlProvider {
 
 ```
 
+### RequestCallback
+
+The main response interface that gets called when the request finishes. ```onRequestDone(ResponseType response)``` is for a success and ```onRequestError(Throwable error, String stringError)``` is meant for failures. 
+
+#### Example
+
+```java
+
+private RequestCallback<AppConfig> mRequestCallback = new RequestCallback<AppConfig>() {
+        @Override
+        public void onRequestDone(AppConfig appFeatureControl) {
+            if(appFeatureControl != null) {
+                Toast.makeText(MainActivity.this, "SUCCESS", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onRequestError(Throwable error, String stringError) {
+            Toast.makeText(MainActivity.this, stringError, Toast.LENGTH_SHORT).show();
+        }
+    };
+
+```
+
 ### RequestExecutor
 
 This the main interface by which a request is executed. Any library that we use for networking, we should create a **Request** executor to plug into this module.
@@ -144,4 +168,3 @@ private class ParserResponseHandler implements ResponseHandler<String, AppConfig
     }
 
 ```
-
