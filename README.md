@@ -27,3 +27,33 @@ Including in your project:
 ```
 
 ## Usage
+
+### Running a simple request
+
+Requests "google.com" and expects to receive a JSON response.
+
+```java
+
+private RequestExecutor<String> mRequestExecutor = new VolleyExecutor();
+
+private void someMethod(){
+  new Request.Builder<String>(mRequestExecutor)
+        .provider(new SimpleUrlProvider("http://www.google.com/")
+        .responseHandler(new SimpleJsonResponseHandler())
+        .execute(mRequestCallback);
+}
+
+private RequestCallback<JSONObject> mRequestCallback = new RequestCallback<JSONObject>() {
+        @Override
+        public void onRequestDone(JSONObject data) {
+           // Success
+        }
+
+        @Override
+        public void onRequestError(Throwable error, String stringError) {
+            // There was an error, stringError is string rep of the error
+        }
+    };
+
+```
+
