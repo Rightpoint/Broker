@@ -3,6 +3,7 @@ package com.raizlabs.android.request;
 import com.raizlabs.android.request.responsehandler.ResponseHandler;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -80,7 +81,7 @@ public class Request<ResponseType> implements UrlProvider{
     /**
      * The URL-encoded params of a {@link com.raizlabs.android.request.Request.Method#GET} request
      */
-    private final Map<String, String> mParams = new HashMap<String, String>();
+    private final Map<String, String> mParams = new LinkedHashMap<String, String>();
 
     /**
      * The headers that get put into the request.
