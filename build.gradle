@@ -33,11 +33,13 @@ android {
         versionName = version.replace("-SNAPSHOT", "")
         versionCode = Integer.parseInt(versionName.replace(".", ""))
     }
-    buildTypes {
-        release {
-            runProguard false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+}
 
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+
+artifacts {
+    archives androidSourcesJar
 }
