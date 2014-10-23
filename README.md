@@ -5,23 +5,12 @@ Provides a standard way to run and handle requests. It enables easy swapping out
 
 ## Getting Started
 
-Including in your project: 
-
-1. Clone this repo into /ProjectRoot/Libraries/
-2. Add this line to your settings.gradle:
-
-```groovy
-
-  include ':Libraries:Request'
-
-```
-
-3. Add this line to your build.gradle:
+Add this line to your build.gradle:
 
 ```groovy
 
   dependencies {
-    compile project(':Libraries:Request');
+    dependency "Request"
   }
 
 ```
@@ -60,11 +49,13 @@ private RequestCallback<JSONObject> mRequestCallback = new RequestCallback<JSONO
 ### Request and Request.Builder
 
 This is the main object that we use to execute our requests. It requires the following:
+
 1. **UrlProvider**
 2. **RequestExecutor**
 3. A predefined **ResponseType** that matches the **ResponseHandler**'s return type.
 
 Supports:
+
 1. Custom contentTypes
 2. Adding a body to the request
 3. Url Params
