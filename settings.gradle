@@ -1,1 +1,3 @@
 rootProject.name = buildName
+
+include ':Request', ':Request-Compiler', ':Request-Core'
