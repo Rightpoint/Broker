@@ -12,7 +12,19 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Headers {
+public @interface Method {
 
-    String[] value();
+    public static final int GET = 0;
+
+    public static final int PUT = 1;
+
+    public static final int DELETE = 2;
+
+    public static final int POST = 3;
+
+    String url();
+
+    int method() default GET;
+
+    Header[] headers() default {};
 }

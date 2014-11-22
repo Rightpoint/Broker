@@ -8,11 +8,11 @@ import java.lang.annotation.Target;
 /**
  * Author: andrewgrosner
  * Contributors: { }
- * Description:
+ * Description: Marks a parameter as a key/value pair. This
  */
-@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Headers {
+@Target(ElementType.PARAMETER)
+public @interface Param {
 
-    String[] value();
+    String value();
 }

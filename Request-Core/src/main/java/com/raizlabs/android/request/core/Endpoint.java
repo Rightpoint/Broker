@@ -8,11 +8,10 @@ import java.lang.annotation.Target;
 /**
  * Author: andrewgrosner
  * Contributors: { }
- * Description:
+ * Description: Marks a parameter as being an endpoint in the URL for a method
  */
-@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Headers {
+@Target(ElementType.PARAMETER)
+public @interface Endpoint {
 
-    String[] value();
 }

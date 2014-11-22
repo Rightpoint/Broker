@@ -10,9 +10,19 @@ import java.lang.annotation.Target;
  * Contributors: { }
  * Description:
  */
-@Target(ElementType.METHOD)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.SOURCE)
-public @interface Headers {
+public @interface Header {
 
-    String[] value();
+    /**
+     * The key name of the header
+     * @return
+     */
+    String value();
+
+    /**
+     * Optional name for it. Only used in {@link com.raizlabs.android.request.core.Method} definition.
+     * @return
+     */
+    String name() default "";
 }

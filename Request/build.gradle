@@ -20,6 +20,8 @@ dependencies {
     androidTestApt project(request_project_prefix + 'Request-Compiler')
     compile project(request_project_prefix + 'Request-Core')
 
+    compile files('libs/volley.jar')
+
 }
 
 if(project.getTasks().findByPath("artifactoryPublish") != null) {
