@@ -61,8 +61,8 @@ public class RequestManager implements Definition{
         javaWriter.beginType(Classes.REQUEST_MANAGER_ADAPTER, "class",
                 Sets.newHashSet(Modifier.PUBLIC, Modifier.FINAL), Classes.REST_ADAPTER);
 
-        javaWriter.emitField("Map<Class<?>, RestInterface>", "mInterfaceMap",
-                Sets.newHashSet(Modifier.PRIVATE, Modifier.FINAL), "new HashMap<Class<?>, RestInterface>()");
+        javaWriter.emitField("Map<Class<?>, BaseRestInterface>", "mInterfaceMap",
+                Sets.newHashSet(Modifier.PRIVATE, Modifier.FINAL), "new HashMap<Class<?>, BaseRestInterface>()");
 
         javaWriter.emitEmptyLine();
         javaWriter.beginConstructor(Sets.newHashSet(Modifier.PUBLIC));

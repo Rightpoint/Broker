@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * Description: Defines the ResponseHandler for a {@link com.raizlabs.android.request.core.RestService}.
  * All RestService must have this annotation in its definition.
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.SOURCE)
 public @interface ResponseHandler {
 
