@@ -11,7 +11,7 @@ public class Classes {
 
     public static final String REST_PACKAGE = REQUEST_PACKAGE + ".rest";
 
-    public static final String REST_INTERFACE = REST_PACKAGE + ".RestInterface";
+    public static final String REST_INTERFACE = REST_PACKAGE + ".BaseRestInterface";
 
     public static final String RESPONSE_HANDLER = REQUEST_PACKAGE + ".responsehandler.ResponseHandler";
 

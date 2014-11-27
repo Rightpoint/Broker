@@ -23,6 +23,15 @@ public class VolleyExecutor implements RequestExecutor<String> {
      */
     static final int sSOCKET_TIMEOUT_MS = 15000;
 
+    private static VolleyExecutor sharedExecutor;
+
+    public static VolleyExecutor getSharedExecutor() {
+        if(sharedExecutor == null) {
+            sharedExecutor = new VolleyExecutor();
+        }
+        return sharedExecutor;
+    }
+
     private RequestQueue mQueue;
 
     private HttpClientStack mStack;

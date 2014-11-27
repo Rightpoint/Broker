@@ -10,9 +10,10 @@ import com.raizlabs.android.request.volley.VolleyExecutor;
 /**
  * Author: andrewgrosner
  * Contributors: { }
- * Description:
+ * Description: Meant for internal use, all interfaces with the RestInterface annotation will generate
+ * a class that extends this class.
  */
-public abstract class RestInterface {
+public abstract class BaseRestInterface {
 
     private ResponseHandler mResponseHandler;
 
@@ -40,8 +41,16 @@ public abstract class RestInterface {
         return url;
     }
 
+    /**
+     * The annotated classes will implement this method automatically.
+     * @return A new instance of a ResponseHandler.
+     */
     public abstract ResponseHandler createResponseHandler();
 
+    /**
+     * @return the handler for this interface. Will call {@link #createResponseHandler()} if the response
+     * handler has not been created yet.
+     */
     public ResponseHandler getResponseHandler() {
         if(mResponseHandler == null) {
             mResponseHandler = createResponseHandler();
@@ -50,10 +59,19 @@ public abstract class RestInterface {
         return mResponseHandler;
     }
 
+    /**
+     * The annotated classes will implement this method automatically (if an annotation is added for it).
+     * If no annotation is found, it returns the shared {@link com.raizlabs.android.request.volley.VolleyExecutor}
+     * @return A new request executor.
+     */
     public RequestExecutor createRequestExecutor() {
-        return new VolleyExecutor();
+        return VolleyExecutor.getSharedExecutor();
     }
 
+    /**
+     * @return The Request executor for this interface. Will call {@link #createRequestExecutor()}
+     * if there is none created yet.
+     */
     public RequestExecutor getRequestExecutor() {
         if(mRequestExecutor == null) {
             mRequestExecutor = createRequestExecutor();
