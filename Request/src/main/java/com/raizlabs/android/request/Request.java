@@ -45,6 +45,12 @@ public class Request<ResponseType> implements UrlProvider{
     private UrlProvider mProvider;
 
     /**
+     * The full url for this request, containing the url from the {@link com.raizlabs.android.request.UrlProvider}
+     * and the encoded URL params.
+     */
+    private String mFullUrl;
+
+    /**
      * The standard interface of executing requests.
      */
     private RequestExecutor mExecutor;
@@ -179,6 +185,17 @@ public class Request<ResponseType> implements UrlProvider{
         String providerUrl = mProvider.getUrl();
         String providerBaseUrl = mProvider.getBaseUrl();
         return providerBaseUrl != null ? (providerBaseUrl + providerUrl) : (providerUrl);
+    }
+
+    /**
+     * @return The full URL including base url, url, and encoded URL params.
+     */
+    public String getFullUrl() {
+        if(mFullUrl == null) {
+            mFullUrl = RequestUtils.formatURL(getUrl(), mParams);
+        }
+
+        return mFullUrl;
     }
 
     @Override

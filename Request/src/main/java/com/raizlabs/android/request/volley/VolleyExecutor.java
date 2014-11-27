@@ -101,7 +101,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
         String url = request.getUrl();
         Request.Method method = request.getMethod();
         if(method.equals(Request.Method.GET)) {
-            url = RequestUtils.formatURL(url, request.getParams());
+            url = request.getFullUrl();
         }
 
         com.android.volley.Request volleyRequest = new VolleyRequest(request, method.ordinal(), url, stringListener, errorListener);
@@ -118,7 +118,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
                 mQueue.cancelAll(new RequestQueue.RequestFilter() {
                     @Override
                     public boolean apply(com.android.volley.Request<?> volleyRequest) {
-                        String url = RequestUtils.formatURL(request.getUrl(), request.getParams());
+                        String url = request.getFullUrl();
                         String url2 = volleyRequest.getUrl();
                         return url.equalsIgnoreCase(url2);
                     }
