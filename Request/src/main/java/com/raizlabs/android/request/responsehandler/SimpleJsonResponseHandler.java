@@ -13,6 +13,7 @@ public class SimpleJsonResponseHandler implements ResponseHandler<String, JSONOb
         try {
             jsonObject = new JSONObject(s);
         } catch (JSONException e) {
+            e.printStackTrace();
         } finally {
             return jsonObject;
         }

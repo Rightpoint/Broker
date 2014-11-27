@@ -25,7 +25,4 @@ public @interface RestService {
      */
     String baseUrl() default "";
 
-    Class<?> responseHandler();
-
-    Class<?> requestExecutor();
 }

@@ -13,6 +13,7 @@ public class SimpleJsonArrayResponseHandler implements ResponseHandler<String, J
         try {
             jsonArray = new JSONArray(s);
         } catch (JSONException e) {
+            e.printStackTrace();
         } finally {
             return jsonArray;
         }

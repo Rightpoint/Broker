@@ -1,6 +1,7 @@
 package com.raizlabs.android.request.compiler.builder;
 
 import com.raizlabs.android.request.compiler.Classes;
+import com.raizlabs.android.request.core.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -16,10 +17,7 @@ public class RequestStatementBuilder  {
     private StringBuilder mBuilder = new StringBuilder();
 
     public RequestStatementBuilder() {
-    }
-
-    public RequestStatementBuilder(String str) {
-        mBuilder.append(str);
+        append("Request request = ");
     }
 
     public RequestStatementBuilder appendEmpty() {
@@ -46,13 +44,13 @@ public class RequestStatementBuilder  {
         return mBuilder.toString();
     }
 
-    public RequestStatementBuilder appendExecute() {
-        mBuilder.append(".execute(requestCallback)");
+    public RequestStatementBuilder appendBuild() {
+        mBuilder.append(".build(requestCallback)");
         return this;
     }
 
     public RequestStatementBuilder appendProvider(String methodName, String url) {
-        mBuilder.append(String.format(".provider(new %1s(getBaseUrl(), \"%1s\", Method.%1s))",
+        mBuilder.append(String.format(".provider(new %1s(getFullBaseUrl(), \"%1s\", Method.%1s))",
                 Classes.SIMPLE_URL_PROVIDER, url, methodName));
         return this;
     }
@@ -73,6 +71,32 @@ public class RequestStatementBuilder  {
 
     public RequestStatementBuilder appendMetaData(String metaDataParamName) {
         mBuilder.append(String.format(".metaData(%1s)", metaDataParamName));
+        return this;
+    }
+
+    public RequestStatementBuilder appendUrlParams(Map<String, Param> urlParams) {
+        if(urlParams != null && !urlParams.isEmpty()) {
+            Set<String> keys = urlParams.keySet();
+            for(String key: keys) {
+                Param param = urlParams.get(key);
+
+                appendEmpty();
+                mBuilder.append(String.format(".addUrlParam(\"%1s\", ", param.value()));
+
+                if(param.encode()) {
+                    mBuilder.append(String.format("%1s.tryEncode(%1s))",
+                            Classes.REQUEST_UTILS, key));
+                } else {
+                    mBuilder.append(String.format("String.valueOf(%1s))", key));
+                }
+            }
+        }
+
+        return this;
+    }
+
+    public RequestStatementBuilder appendExecute() {
+        append("request.execute()");
         return this;
     }
 }

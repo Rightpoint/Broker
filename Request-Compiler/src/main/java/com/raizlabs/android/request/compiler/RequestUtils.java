@@ -1,5 +1,7 @@
 package com.raizlabs.android.request.compiler;
 
+import com.raizlabs.android.request.core.RequestExecutor;
+import com.raizlabs.android.request.core.ResponseHandler;
 import com.raizlabs.android.request.core.RestService;
 
 import java.util.ArrayList;
@@ -15,11 +17,11 @@ import javax.lang.model.type.MirroredTypeException;
  */
 public class RequestUtils {
 
-    public static String getResponseHandler(RestService annotation) {
+    public static String getResponseHandler(ResponseHandler annotation) {
         String clazz = null;
         if (annotation != null) {
             try {
-                annotation.responseHandler();
+                annotation.value();
             } catch (MirroredTypeException mte) {
                 clazz = mte.getTypeMirror().toString();
             }
@@ -27,11 +29,11 @@ public class RequestUtils {
         return clazz;
     }
 
-    public static String getRequestExecutor(RestService annotation) {
+    public static String getRequestExecutor(RequestExecutor annotation) {
         String clazz = null;
         if (annotation != null) {
             try {
-                annotation.requestExecutor();
+                annotation.value();
             } catch (MirroredTypeException mte) {
                 clazz = mte.getTypeMirror().toString();
             }

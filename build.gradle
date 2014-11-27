@@ -12,9 +12,11 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.14.2'
-        classpath 'com.raizlabs.android-modules:libraryplugin:1.0.12'
-        classpath 'com.raizlabs.android-modules:artifactorypublisher:1.0.0'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:2.2.5"
+
+        if(project.getTasks().findByPath("artifactoryPublish") != null) {
+            classpath 'com.raizlabs.android-modules:artifactorypublisher:1.0.0'
+            classpath "org.jfrog.buildinfo:build-info-extractor-gradle:2.2.5"
+        }
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
     }
 }

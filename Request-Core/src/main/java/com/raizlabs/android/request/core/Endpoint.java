@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * Author: andrewgrosner
- * Contributors: { }
- * Description: Marks a parameter as being an endpoint in the URL for a method
+ * Description: Marks a parameter in a {@link com.raizlabs.android.request.core.RestService} method
+ * as being an endpoint in the URL.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.PARAMETER)

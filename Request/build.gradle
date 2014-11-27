@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.raizlabs.libraryplugin'
-apply plugin: 'com.raizlabs.artifactorypublisher'
+if(project.getTasks().findByPath("artifactoryPublish") != null) {
+    apply plugin: 'com.raizlabs.artifactorypublisher'
+}
 apply plugin: 'android-apt'
 
 android {

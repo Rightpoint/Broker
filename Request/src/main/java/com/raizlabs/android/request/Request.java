@@ -1,5 +1,6 @@
 package com.raizlabs.android.request;
 
+import com.raizlabs.android.request.metadata.RequestMetadataGenerator;
 import com.raizlabs.android.request.responsehandler.ResponseHandler;
 
 import java.util.HashMap;
@@ -197,7 +198,7 @@ public class Request<ResponseType> implements UrlProvider{
         return mHeaders;
     }
 
-    public RequestCallback getCallback() {
+    public RequestCallback<ResponseType> getCallback() {
         return mCallback;
     }
 
@@ -278,6 +279,18 @@ public class Request<ResponseType> implements UrlProvider{
         }
 
         /**
+         * Attach a unique ID to this request that the {@link com.raizlabs.android.request.RequestExecutor}
+         * can handle using a {@link com.raizlabs.android.request.metadata.RequestMetadataGenerator}.
+         * Call this right before execute, so that the parameters of the contained request are all available.
+         * @param generator
+         * @return
+         */
+        public Builder<ResponseType> metaDataGenerator(RequestMetadataGenerator generator) {
+            mRequest.setMetaData(generator.generate(mRequest));
+            return this;
+        }
+
+        /**
          * Sets the contentType header of this request
          * @param contentType
          * @return
@@ -344,9 +357,8 @@ public class Request<ResponseType> implements UrlProvider{
          * @param requestCallback
          * @return
          */
-        public Request<ResponseType> execute(RequestCallback requestCallback) {
+        public Request<ResponseType> build(RequestCallback requestCallback) {
             mRequest.setCallback(requestCallback);
-            mRequest.execute();
             return mRequest;
         }
     }

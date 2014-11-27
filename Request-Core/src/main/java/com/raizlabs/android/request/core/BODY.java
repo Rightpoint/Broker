@@ -7,8 +7,8 @@ import java.lang.annotation.Target;
 
 /**
  * Author: andrewgrosner
- * Contributors: { }
- * Description:
+ * Description: Marks a parameter in a {@link com.raizlabs.android.request.core.RestService} method as
+ * pertaining to the body of a request.
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.PARAMETER)

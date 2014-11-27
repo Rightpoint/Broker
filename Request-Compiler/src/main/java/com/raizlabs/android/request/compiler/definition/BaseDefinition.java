@@ -20,7 +20,7 @@ public abstract class BaseDefinition implements Definition {
 
     private final Element element;
 
-    String elementClassName;
+    public String elementClassName;
 
     private String packageName;
 
@@ -53,6 +53,10 @@ public abstract class BaseDefinition implements Definition {
 
     public String getSourceFileName() {
         return packageName + "." + definitionClassName;
+    }
+
+    public String getFQCN() {
+        return packageName + "." + elementClassName;
     }
 
     protected String[] getImports() {

@@ -42,13 +42,14 @@ public class RequestUtils {
      * @param data
      * @return
      */
-    private static String tryEncode(String data) {
+    public static String tryEncode(Object data) {
 
+        String encoded = "";
         try {
-            data = URLEncoder.encode(data, CHARSET_DEF);
+            encoded = URLEncoder.encode(String.valueOf(data), CHARSET_DEF);
         } catch (UnsupportedEncodingException e) {
         }
 
-        return data;
+        return encoded;
     }
 }

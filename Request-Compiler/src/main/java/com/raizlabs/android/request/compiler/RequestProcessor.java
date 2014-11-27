@@ -7,11 +7,12 @@ import com.raizlabs.android.request.compiler.handler.RestServiceHandler;
 import com.raizlabs.android.request.core.Body;
 import com.raizlabs.android.request.core.Endpoint;
 import com.raizlabs.android.request.core.Header;
-import com.raizlabs.android.request.core.Headers;
 import com.raizlabs.android.request.core.Method;
 import com.raizlabs.android.request.core.Param;
 import com.raizlabs.android.request.core.RestService;
+import com.squareup.javawriter.JavaWriter;
 
+import java.io.IOException;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -41,7 +42,7 @@ public class RequestProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return Sets.newHashSet(Method.class.getName(), Headers.class.getName(),
+        return Sets.newHashSet(Method.class.getName(),
                 RestService.class.getName(), Header.class.getName(),
                 Body.class.getName(), Param.class.getName(), Endpoint.class.getName());
     }
@@ -55,6 +56,15 @@ public class RequestProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for(Handler handler: mHandlers) {
             handler.handle(requestManager, roundEnv);
+        }
+
+        try {
+            JavaWriter javaWriter = new JavaWriter(requestManager.getFiler()
+                    .createSourceFile(Classes.REQUEST_MANAGER_ADAPTER).openWriter());
+            requestManager.write(javaWriter);
+            javaWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return false;
     }

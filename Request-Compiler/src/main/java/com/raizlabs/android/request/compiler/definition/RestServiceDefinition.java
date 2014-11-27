@@ -6,6 +6,8 @@ import com.raizlabs.android.request.compiler.RequestManager;
 import com.raizlabs.android.request.compiler.RequestUtils;
 import com.raizlabs.android.request.compiler.WriterUtils;
 import com.raizlabs.android.request.core.Method;
+import com.raizlabs.android.request.core.RequestExecutor;
+import com.raizlabs.android.request.core.ResponseHandler;
 import com.raizlabs.android.request.core.RestService;
 import com.squareup.javawriter.JavaWriter;
 
@@ -43,8 +45,20 @@ public class RestServiceDefinition extends BaseDefinition {
         RestService restService = typeElement.getAnnotation(RestService.class);
         baseUrlRes = restService.baseUrl();
         baseUrlResId = restService.baseUrlResId();
-        responseHandlerClass = RequestUtils.getResponseHandler(restService);
-        requestExecutorClass = RequestUtils.getRequestExecutor(restService);
+
+        ResponseHandler responseHandler = typeElement.getAnnotation(ResponseHandler.class);
+        if(responseHandler != null) {
+            responseHandlerClass = RequestUtils.getResponseHandler(responseHandler);
+        } else {
+            responseHandlerClass = ResponseHandler.class.getCanonicalName();
+        }
+
+        RequestExecutor requestExecutor = typeElement.getAnnotation(RequestExecutor.class);
+        if(requestExecutor != null) {
+            requestExecutorClass = RequestUtils.getRequestExecutor(requestExecutor);
+        } else {
+            requestExecutorClass = RequestExecutor.class.getCanonicalName();
+        }
 
         restMethodDefinitions = new ArrayList<RestMethodDefinition>();
         List<? extends Element> elements = typeElement.getEnclosedElements();
@@ -60,7 +74,8 @@ public class RestServiceDefinition extends BaseDefinition {
         return new String[]{
                 Classes.RESPONSE_HANDLER,
                 Classes.REQUEST_EXECUTOR,
-                Classes.METHOD
+                Classes.METHOD,
+                Classes.REQUEST
         };
     }
 
