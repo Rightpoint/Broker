@@ -6,6 +6,7 @@ import com.raizlabs.android.request.responsehandler.ResponseHandler;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The class that handles all requests. It simplifies the request set up process and enables swapping out
@@ -239,6 +240,30 @@ public class Request<ResponseType> implements UrlProvider{
         if(mExecutor != null) {
             mExecutor.execute(this);
         }
+    }
+
+
+    @Override
+    public String toString() {
+        StringBuilder retString = new StringBuilder("URL: ").append(getFullUrl());
+        retString.append("\nHeaders: ");
+
+        Set<String> headers = mHeaders.keySet();
+        for(String header: headers) {
+            retString.append(header).append(": ").append(mHeaders.get(header)).append("\t\n");
+        }
+
+        if(mBody != null && !mBody.isEmpty()) {
+            retString.append("\nBody: ").append(mBody);
+        }
+
+        retString.append("\nContent-Type: ").append(mContentType);
+
+        if(mMetaData != null) {
+            retString.append("\nMetadata: ").append(mMetaData);
+        }
+
+        return retString.toString();
     }
 
     /**
