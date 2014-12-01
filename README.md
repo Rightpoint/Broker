@@ -12,7 +12,7 @@ Add this line to your build.gradle:
 ```groovy
 
   dependencies {
-    compile project(":Libraries:Request")
+    compile project(":Libraries:Broker")
   }
 
 ```
