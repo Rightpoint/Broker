@@ -140,6 +140,14 @@ public class RestMethodDefinition implements Definition {
                             method = "POST";
                         } else if (methodType == Method.PUT) {
                             method = "PUT";
+                        } else if (methodType == Method.HEAD) {
+                            method = "HEAD";
+                        } else if (methodType == Method.OPTIONS) {
+                            method = "OPTIONS";
+                        } else if (methodType == Method.TRACE) {
+                            method = "TRACE";
+                        } else if (methodType == Method.PATCH) {
+                            method = "PATCH";
                         } else {
                             method = "";
                         }

@@ -23,5 +23,5 @@ public interface UrlProvider {
      * Return the Method that this provider will use.
      * @return
      */
-    Request.Method getMethod();
+    int getMethod();
 }

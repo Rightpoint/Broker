@@ -12,6 +12,7 @@ import com.raizlabs.android.request.RequestCallback;
 import com.raizlabs.android.request.RequestConfig;
 import com.raizlabs.android.request.RequestExecutor;
 import com.raizlabs.android.request.RequestUtils;
+import com.raizlabs.android.request.core.Method;
 
 /**
  * Description:
@@ -99,12 +100,12 @@ public class VolleyExecutor implements RequestExecutor<String> {
         };
 
         String url = request.getUrl();
-        Request.Method method = request.getMethod();
-        if(method.equals(Request.Method.GET)) {
+        int method = request.getMethod();
+        if(method == Method.GET) {
             url = request.getFullUrl();
         }
 
-        com.android.volley.Request volleyRequest = new VolleyRequest(request, method.ordinal(), url, stringListener, errorListener);
+        com.android.volley.Request volleyRequest = new VolleyRequest(request, method, url, stringListener, errorListener);
         volleyRequest.setRetryPolicy(mRetryPolicy);
         mQueue.add(volleyRequest);
     }

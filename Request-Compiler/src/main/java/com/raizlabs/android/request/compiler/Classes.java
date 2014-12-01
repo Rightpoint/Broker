@@ -21,7 +21,7 @@ public class Classes {
 
     public static final String SIMPLE_URL_PROVIDER = REQUEST_PACKAGE + ".SimpleUrlProvider";
 
-    public static final String METHOD = REQUEST_PACKAGE + ".Request.Method";
+    public static final String METHOD = REQUEST_PACKAGE + ".core.Method";
 
     public static final CharSequence REQUEST_MANAGER = REQUEST_PACKAGE + ".RequestManager";
 

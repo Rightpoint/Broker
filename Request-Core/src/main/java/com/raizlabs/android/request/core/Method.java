@@ -20,19 +20,40 @@ public @interface Method {
     public static final int GET = 0;
 
     /**
+     * HTTP POST
+     */
+    public static final int POST = 1;
+
+    /**
+     *
      * HTTP PUT
      */
-    public static final int PUT = 1;
+    public static final int PUT = 2;
 
     /**
      * HTTP DELETE
      */
-    public static final int DELETE = 2;
+    public static final int DELETE = 3;
 
     /**
-     * HTTP POST
+     * HTTP HEAD
      */
-    public static final int POST = 3;
+    public static final int HEAD = 4;
+
+    /**
+     * HTTP OPTIONS
+     */
+    public static final int OPTIONS = 5;
+
+    /**
+     * HTTP TRACE
+     */
+    public static final int TRACE = 6;
+
+    /**
+     * HTTP PATCH
+     */
+    public static final int PATCH = 7;
 
     /**
      * The url for this request method. Must not contain the base url, it is the second piece that will

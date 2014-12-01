@@ -1,5 +1,7 @@
 package com.raizlabs.android.request;
 
+import com.raizlabs.android.request.core.Method;
+
 /**
  * Provides a basic implementation that allows simple Url requests.
  */
@@ -18,10 +20,10 @@ public class SimpleUrlProvider implements UrlProvider {
     /**
      * The method of this provider
      */
-    private final Request.Method mMethod;
+    private final int mMethod;
 
     /**
-     * Constructs this provider with the specified URL and {@link Request.Method#GET}
+     * Constructs this provider with the specified URL and {@link com.raizlabs.android.request.core.Method#GET}
      * @param url
      */
     public SimpleUrlProvider(String url) {
@@ -29,26 +31,26 @@ public class SimpleUrlProvider implements UrlProvider {
     }
 
     /**
-     * Constructs this provider with the specified base URL, URL, and {@link Request.Method#GET}
+     * Constructs this provider with the specified base URL, URL, and {@link com.raizlabs.android.request.core.Method#GET}
      * @param url
      */
     public SimpleUrlProvider(String baseUrl, String url) {
-        this(baseUrl, url, Request.Method.GET);
+        this(baseUrl, url, Method.GET);
     }
 
     /**
-     * Constructs this provider with the specified URL and {@link Request.Method}
+     * Constructs this provider with the specified URL and {@link com.raizlabs.android.request.core.Method} int
      * @param url
      */
-    public SimpleUrlProvider(String url, Request.Method method) {
+    public SimpleUrlProvider(String url, int method) {
         this("", url, method);
     }
 
     /**
-     * Constructs this provider with the specified base URL, URL, and {@link Request.Method}
+     * Constructs this provider with the specified base URL, URL, and {@link com.raizlabs.android.request.core.Method}
      * @param url
      */
-    public SimpleUrlProvider(String baseUrl, String url, Request.Method method) {
+    public SimpleUrlProvider(String baseUrl, String url, int method) {
         mBaseUrl = baseUrl;
         mUrl = url;
         mMethod = method;
@@ -65,7 +67,7 @@ public class SimpleUrlProvider implements UrlProvider {
     }
 
     @Override
-    public Request.Method getMethod() {
+    public int getMethod() {
         return mMethod;
     }
 }

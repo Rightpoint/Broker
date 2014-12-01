@@ -16,30 +16,6 @@ import java.util.Set;
  */
 public class Request<ResponseType> implements UrlProvider{
 
-    public enum Method {
-
-        /**
-         * We will run a get request here
-         */
-        GET,
-
-        /**
-         * We will run a post
-         */
-        POST,
-
-        /**
-         * We will run a put
-         */
-        PUT,
-
-        /**
-         * We will run a delete
-         */
-        DELETE
-
-    }
-
     /**
      * The {@link com.raizlabs.android.request.UrlProvider} that we use to retrieve the url for this request.
      */
@@ -87,7 +63,7 @@ public class Request<ResponseType> implements UrlProvider{
     };
 
     /**
-     * The URL-encoded params of a {@link com.raizlabs.android.request.Request.Method#GET} request
+     * The URL-encoded params of a {@link com.raizlabs.android.request.core.Method#GET} request
      */
     private final Map<String, String> mParams = new LinkedHashMap<String, String>();
 
@@ -200,7 +176,7 @@ public class Request<ResponseType> implements UrlProvider{
     }
 
     @Override
-    public Method getMethod() {
+    public int getMethod() {
         return mProvider.getMethod();
     }
 
