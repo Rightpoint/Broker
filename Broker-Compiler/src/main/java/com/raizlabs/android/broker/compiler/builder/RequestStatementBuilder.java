@@ -35,11 +35,7 @@ public class RequestStatementBuilder  {
     }
 
     public RequestStatementBuilder appendResponseHandler(String responseHandler) {
-        String responseHandlerString = "getResponseHandler()";
-        if(responseHandler != null && !responseHandler.isEmpty()) {
-            responseHandlerString = String.format("new %1s()", responseHandler);
-        }
-        mBuilder.append(String.format(".responseHandler(%1s)", responseHandlerString));
+        mBuilder.append(String.format(".responseHandler(getResponseHandler(%1s))", responseHandler == null ? null : responseHandler + ".class"));
         return this;
     }
 

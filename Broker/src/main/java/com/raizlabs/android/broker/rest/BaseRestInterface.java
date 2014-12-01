@@ -5,6 +5,9 @@ import com.raizlabs.android.broker.RequestExecutor;
 import com.raizlabs.android.broker.responsehandler.ResponseHandler;
 import com.raizlabs.android.broker.volley.VolleyExecutor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Author: andrewgrosner
  * Contributors: { }
@@ -13,7 +16,7 @@ import com.raizlabs.android.broker.volley.VolleyExecutor;
  */
 public abstract class BaseRestInterface {
 
-    private ResponseHandler mResponseHandler;
+    private Map<Class<? extends ResponseHandler>, ResponseHandler> mResponseHandlerMap;
 
     private RequestExecutor mRequestExecutor;
 
@@ -49,12 +52,28 @@ public abstract class BaseRestInterface {
      * @return the handler for this interface. Will call {@link #createResponseHandler()} if the response
      * handler has not been created yet.
      */
-    public ResponseHandler getResponseHandler() {
-        if(mResponseHandler == null) {
-            mResponseHandler = createResponseHandler();
+    public ResponseHandler getResponseHandler(Class<? extends ResponseHandler> responseHandlerClass) {
+        ResponseHandler responseHandler;
+        if(mResponseHandlerMap == null) {
+            mResponseHandlerMap = new HashMap<Class<? extends ResponseHandler>, ResponseHandler>();
         }
 
-        return mResponseHandler;
+        responseHandler = mResponseHandlerMap.get(responseHandlerClass);
+        if(responseHandler == null) {
+            if(responseHandlerClass == null) {
+                responseHandler = createResponseHandler();
+            } else {
+                try {
+                    responseHandler = responseHandlerClass.newInstance();
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            mResponseHandlerMap.put(responseHandlerClass, responseHandler);
+        }
+
+        return responseHandler;
     }
 
     /**
