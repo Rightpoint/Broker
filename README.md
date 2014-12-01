@@ -95,7 +95,7 @@ Within the function parameters, we must use annotations to specify what paramete
 
 ```@ResponseHandler```:  allows for a different response handler for this method than the default in the class. **Warning:** using non-default will create a new one for each specified using reflection. 
 
-```@Body```: The parameter is the body to the request. It must be a String, ```FileInputStream```, or ```File```. 
+```@Body```: The parameter is the body to the request. It must be a String, ```InputStream```, or ```File```. 
 
 
 ```java
