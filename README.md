@@ -1,19 +1,25 @@
-# Request
+# Broker
 
-Provides a standard way to run and handle requests. It enables easy swapping out of request libraries using **RequestExecutors** 
+A façade between executing requests and creating them. The library provides an interface for creating requests, but delegates the actual execution to ```RequestExecutors``. 
 
 
 ## Getting Started
+
+### Locally: 
 
 Add this line to your build.gradle:
 
 ```groovy
 
   dependencies {
-    dependency "Request"
+    compile project(":Libraries:Request")
   }
 
 ```
+
+### Remotely
+
+Coming soon
 
 ## Usage
 
