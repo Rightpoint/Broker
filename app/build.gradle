@@ -24,7 +24,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.2'
 
-    apt project(request_project_prefix + "Request-Compiler")
-    compile project(request_project_prefix + "Request-Core")
-    compile project(request_project_prefix + "Request")
+    apt project(request_project_prefix + "Broker-Compiler")
+    compile project(request_project_prefix + "Broker-Core")
+    compile project(request_project_prefix + "Broker")
 }
