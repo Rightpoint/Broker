@@ -1,25 +1,31 @@
-# Request
+# Broker
 
-Provides a standard way to run and handle requests. It enables easy swapping out of request libraries using **RequestExecutors** 
+A façade between executing requests and creating them. The library provides an interface for creating requests, but delegates the actual execution to ```RequestExecutors```. 
 
 
 ## Getting Started
+
+### Locally: 
 
 Add this line to your build.gradle:
 
 ```groovy
 
   dependencies {
-    dependency "Request"
+    compile project(":Libraries:Request")
   }
 
 ```
+
+### Remotely
+
+Coming soon
 
 ## Usage
 
 ### Running a simple request
 
-Requests "google.com" and expects to receive a JSON response.
+Requests "google.com" and expects to receive a JSON response. The ```Request.Builder``` class when calling ```build()``` returns a read-only ```Request``` object. To run the request, call ```execute()```.
 
 ```java
 
@@ -29,7 +35,7 @@ private void someMethod(){
   new Request.Builder<String>(mRequestExecutor)
         .provider(new SimpleUrlProvider("http://www.google.com/")
         .responseHandler(new SimpleJsonResponseHandler())
-        .execute(mRequestCallback);
+        .build(mRequestCallback).execute();
 }
 
 private RequestCallback<JSONObject> mRequestCallback = new RequestCallback<JSONObject>() {
@@ -43,6 +49,75 @@ private RequestCallback<JSONObject> mRequestCallback = new RequestCallback<JSONO
             // There was an error, stringError is string rep of the error
         }
     };
+
+```
+
+### REST Interfaces
+
+This library supports annotation processing for generating ```$RestService``` classes that contain all of the code of constructing the intended request. This is similar to [Retrofit](http://square.github.io/retrofit/), however that library uses reflection to generate requests, causing it to be very __slow__. We use annotation processing since it is **transparent** (can read the code that is generated), and as fast as native when executed. 
+
+Each REST interface must be an __interface__ since the generated code has a base class.
+
+#### Simple example
+
+For this example we are purely making up URLs and data. For the specified class to build correctly, we 
+need to define 3 annotations:
+
+```@RestService```: Specify either a baseUrl or baseUrlResId for the service
+```@RequestExecutor```: Tells what ```RequestExecutor``` to create for this service to use. The default is a shared ```VolleyExecutor```. 
+```@ResponseHandler```: Defines the default ```ResponseHandler``` class to use if none is specified for each ```@Method```.
+
+
+```java
+
+@RestService(baseUrl = "https://www.google.com")
+@RequestExecutor(VolleyExecutor.class)
+@ResponseHandler(SimpleJsonResponseHandler.class)
+public interface SimpleRestService {
+
+}
+
+```
+
+Next we define each ```@Method``` we want to generate from this interface. 
+
+```@Method```: Defines a url (that's appended to the end of the base url), what HTTP method to use (use ```@Method``` constants), and static HTTP headers. Each must contain a ```RequestCallback``` and return void, or return ```Request``` without the ```RequestCallback``` to be valid.
+
+Within the function parameters, we must use annotations to specify what parameter goes where:
+
+```@Endpoint```: Marks the parameter as corresponding to a bracket-enclosed piece of the ```@Method``` url. This enables dynamic endpointing. The name of the variable MUST match the name in the URL. 
+
+```@Header```: The parameter is a request header with a specified static key. 
+
+```@Metadata```: passes the parameter as a tag or piece of information about the request. Can only be one per method.
+
+```@Param```: Marks the parameter as a url parameter where the value is URL encoded by default. 
+
+```@ResponseHandler```:  allows for a different response handler for this method than the default in the class. **Warning:** using non-default will create a new one for each specified using reflection. 
+
+```@Body```: The parameter is the body to the request. It must be a String, ```InputStream```, or ```File```. 
+
+
+```java
+
+    @Method(url = "/users/{userName}/{password}",
+            headers = {@Header(name = "MAC", value = "OS")})
+    public void getUsers(@Endpoint String password, @Endpoint String userName, @Header("User-Agent") String userAgent, RequestCallback<JSONObject> requestCallback);
+
+    @Method(url = "/users/{firstName}", method = Method.PUT)
+    public void putFirstName(@Endpoint String firstName, @Body String requestBody, RequestCallback<JSONObject> requestCallback);
+
+    @Method(url = "/hello/{goodBye}", method = Method.DELETE)
+    public void deleteGoodbye(@Param("myNameIs") String what,
+                              @Param("jasonSays") String yeah,
+                              @Endpoint String goodBye,
+                              @Metadata double flack,
+                              RequestCallback<JSONObject> requestCallback);
+
+    @Method(url = "/hello/yep")
+    @ResponseHandler(SimpleJsonArrayResponseHandler.class)
+    public void getYep(RequestCallback<JSONArray> requestCallback);
+}
 
 ```
 
