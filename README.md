@@ -142,7 +142,7 @@ It enables enums and other classes to provide a url for the request in a standar
 
 #### Example
 
-This is an example from Costco, where we define a base url that the other enum objects use in combination with its own defined endpoint. Works very well with REST APIs.
+This is an example, where we define a base url that the other enum objects use in combination with its own defined endpoint. Works very well with REST APIs, or swapping between different endpoints.
 
 ```java
 
@@ -163,7 +163,7 @@ private enum AppUrlProvider implements UrlProvider {
 
         @Override
         public String getBaseUrl() {
-            return "https://mobilecontent.costco.com/";
+            return "https://www.someurl.com/";
         }
 
         @Override
