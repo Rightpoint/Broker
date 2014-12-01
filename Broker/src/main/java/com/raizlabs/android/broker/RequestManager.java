@@ -14,7 +14,7 @@ public class RequestManager {
     public static RestAdapter getRestAdapter() {
         if(restAdapter == null) {
             try {
-                restAdapter = (RestAdapter) Class.forName("com.raizlabs.android.request.RequestManager$Adapter").newInstance();
+                restAdapter = (RestAdapter) Class.forName("com.raizlabs.android.broker.RequestManager$Adapter").newInstance();
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
