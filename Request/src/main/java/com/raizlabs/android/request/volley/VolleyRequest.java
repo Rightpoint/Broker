@@ -6,7 +6,9 @@ import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.raizlabs.android.request.Request;
 
-import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +24,11 @@ public class VolleyRequest extends StringRequest {
 
     /**
      * Constructs a new volley request with our {@link com.raizlabs.android.request.Request} object
-     * @param request - the {@link com.raizlabs.android.request.Request}
-     * @param method - the volley Method int
-     * @param url - URL formatted url from Request
-     * @param listener - the listener for a response
+     *
+     * @param request       - the {@link com.raizlabs.android.request.Request}
+     * @param method        - the volley Method int
+     * @param url           - URL formatted url from Request
+     * @param listener      - the listener for a response
      * @param errorListener - the listener for an error
      */
     public VolleyRequest(Request request, int method, String url, Response.Listener<String> listener, Response.ErrorListener errorListener) {
@@ -72,10 +75,29 @@ public class VolleyRequest extends StringRequest {
 
     @Override
     public byte[] getBody() throws AuthFailureError {
-        try {
-            return mRequest.getBody() == null ? super.getBody() : mRequest.getBody().getBytes("utf-8");
-        } catch (UnsupportedEncodingException e) {
-            return super.getBody();
+        byte[] body;
+        if (mRequest.getBody() == null) {
+            body = super.getBody();
+        } else {
+
+            InputStream requestInputStream = mRequest.getBody();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+            int nRead;
+            byte[] data = new byte[16384];
+
+            try {
+                while ((nRead = requestInputStream.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            body = buffer.toByteArray();
         }
+
+        return body;
     }
 }

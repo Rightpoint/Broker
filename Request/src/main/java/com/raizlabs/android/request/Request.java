@@ -3,6 +3,11 @@ package com.raizlabs.android.request;
 import com.raizlabs.android.request.metadata.RequestMetadataGenerator;
 import com.raizlabs.android.request.responsehandler.ResponseHandler;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,7 +55,12 @@ public class Request<ResponseType> implements UrlProvider{
     /**
      * An optional body such as JSON or String that we put in the request.
      */
-    private String mBody;
+    private InputStream mBody;
+
+    /**
+     * The length of the body to read
+     */
+    private long mBodyLength;
 
     /**
      * Handles responses for us. The default is to do nothing but return the request.
@@ -125,8 +135,9 @@ public class Request<ResponseType> implements UrlProvider{
      * Sets the body of the request
      * @param mBody
      */
-    void setBody(String mBody) {
+    void setBody(InputStream mBody, long inputStreamLength) {
         this.mBody = mBody;
+        this.mBodyLength = inputStreamLength;
     }
 
     /**
@@ -208,7 +219,7 @@ public class Request<ResponseType> implements UrlProvider{
         return mContentType;
     }
 
-    public String getBody() {
+    public InputStream getBody() {
         return mBody;
     }
 
@@ -229,7 +240,7 @@ public class Request<ResponseType> implements UrlProvider{
             retString.append(header).append(": ").append(mHeaders.get(header)).append("\t\n");
         }
 
-        if(mBody != null && !mBody.isEmpty()) {
+        if(mBody != null) {
             retString.append("\nBody: ").append(mBody);
         }
 
@@ -324,7 +335,32 @@ public class Request<ResponseType> implements UrlProvider{
          * @return
          */
         public Builder<ResponseType> body(String body) {
-            mRequest.setBody(body);
+            byte[] bodyBytes = body.getBytes();
+            mRequest.setBody(new ByteArrayInputStream(bodyBytes), bodyBytes.length);
+            return this;
+        }
+
+        /**
+         * Optional data passed into the request as byte code.
+         * @param body
+         * @return
+         */
+        public Builder<ResponseType> body(InputStream body, long inputStreamLength) {
+            mRequest.setBody(body, inputStreamLength);
+            return this;
+        }
+
+        /**
+         * Optional data passed into the request as byte code.
+         * @param body
+         * @return
+         */
+        public Builder<ResponseType> body(File body) {
+            try {
+                mRequest.setBody(new FileInputStream(body), body.length());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             return this;
         }
 
