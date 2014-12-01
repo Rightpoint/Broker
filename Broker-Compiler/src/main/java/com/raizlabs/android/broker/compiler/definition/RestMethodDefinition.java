@@ -3,6 +3,7 @@ package com.raizlabs.android.broker.compiler.definition;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.raizlabs.android.broker.compiler.RequestManager;
+import com.raizlabs.android.broker.compiler.RequestUtils;
 import com.raizlabs.android.broker.compiler.RestParameterMatcher;
 import com.raizlabs.android.broker.compiler.WriterUtils;
 import com.raizlabs.android.broker.compiler.builder.RequestStatementBuilder;
@@ -12,6 +13,7 @@ import com.raizlabs.android.broker.core.Header;
 import com.raizlabs.android.broker.core.Metadata;
 import com.raizlabs.android.broker.core.Method;
 import com.raizlabs.android.broker.core.Param;
+import com.raizlabs.android.broker.core.ResponseHandler;
 import com.squareup.javawriter.JavaWriter;
 
 import java.io.IOException;
@@ -54,6 +56,8 @@ public class RestMethodDefinition implements Definition {
      */
     private String body;
 
+    String responseHandler;
+
     Map<String, Param> urlParams;
 
     public RestMethodDefinition(RequestManager requestManager, Element inElement) {
@@ -69,6 +73,10 @@ public class RestMethodDefinition implements Definition {
         Header[] headers = method.headers();
         for (Header header : headers) {
             this.headers.put(header.name(), "\"" + header.value() + "\"");
+        }
+
+        if(inElement.getAnnotation(ResponseHandler.class) != null) {
+            responseHandler = RequestUtils.getResponseHandler(inElement.getAnnotation(ResponseHandler.class));
         }
 
         List<? extends VariableElement> params = element.getParameters();
@@ -122,7 +130,7 @@ public class RestMethodDefinition implements Definition {
                     public void write(JavaWriter javaWriter) throws IOException {
                         RequestStatementBuilder builder = new RequestStatementBuilder().appendEmpty()
                                 .appendRequest().appendEmpty()
-                                .appendResponseHandler().appendEmpty();
+                                .appendResponseHandler(responseHandler).appendEmpty();
                         if (!headers.isEmpty()) {
                             builder.appendHeaders(headers).appendEmpty();
                         }
