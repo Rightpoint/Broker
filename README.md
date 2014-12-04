@@ -208,7 +208,7 @@ Override the ```execute(Request request)``` method and handle the data that is p
 
 ### ResponseHandlers
 
-ResponseHandlers define how to convert a response into another. It's ```ResponseType``` should match the **RequestCallback**s type-param. 
+ResponseHandlers define how to convert a response into another. It's ```ResponseType``` should match the ```RequestCallback```'s type-param. 
 
 #### Example
 
