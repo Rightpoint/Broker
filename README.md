@@ -178,7 +178,7 @@ private enum AppUrlProvider implements UrlProvider {
 
 ### RequestCallback
 
-The main response interface that gets called when the request finishes. ```onRequestDone(ResponseType response)``` is for a success and ```onRequestError(Throwable error, String stringError)``` is meant for failures. 
+The main response interface that gets called when the request finishes. ```onRequestDone(ResponseType response)``` is for a success and ```onRequestError(Throwable error, String stringError)``` is meant for failures. The parameter of this callback **MUST** match the return type of the ```ResponseHandler```.
 
 #### Example
 
@@ -212,6 +212,8 @@ ResponseHandlers define how to convert a response into another. It's ```Response
 
 #### Example
 
+Using our other library, [Parser](https://github.com/Raizlabs/Parser) (which also uses annotation processing, for parsing data into objects) this response handler converts the string data into an ```AppConfig``` object. 
+
 Example of converting a string into an ```AppConfig``` object. 
 
 ```java
@@ -220,15 +222,7 @@ private class ParserResponseHandler implements ResponseHandler<String, AppConfig
 
         @Override
         public AppConfig processResponse(String s) {
-            AppConfig appConfig = null;
-            try {
-                JSONObject appJson = new JSONObject(s);
-                appConfig = parser.parse(AppConfig.class, appJson);
-            } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
-            } finally {
-                return appConfig;
-            }
+                return ParserHolder.parse(AppConfig.class, new JSONObject(s));
         }
     }
 
