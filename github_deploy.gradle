@@ -1,0 +1,12 @@
+apply plugin: 'maven'
+
+uploadArchives {
+    repositories.mavenDeployer {
+        def deployPath = file(getProperty('deployPath'))
+        repository(url: "file://${deployPath.absolutePath}")
+        pom.project {
+            groupId 'com.raizlabs.android'
+            artifactId buildName
+        }
+    }
+}

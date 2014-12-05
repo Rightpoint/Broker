@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.raizlabs.android</groupId>
+  <artifactId>Broker-Compiler</artifactId>
+  <version>1.0.0</version>
+  <versioning>
+    <versions>
+      <version>1.0.0</version>
+    </versions>
+    <lastUpdated>20141205205808</lastUpdated>
+  </versioning>
+</metadata>

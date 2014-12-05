@@ -25,6 +25,8 @@ dependencies {
 
 }
 
+apply from: '../github_deploy.gradle'
+
 if(project.getTasks().findByPath("artifactoryPublish") != null) {
     artifactoryPublish.dependsOn {
         androidSourcesJar
