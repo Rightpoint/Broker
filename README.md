@@ -5,21 +5,47 @@ A façade between executing requests and creating them. The library provides an 
 
 ## Getting Started
 
+### Remotely
+
+Add the repo as a maven url to your classpath:
+
+```
+
+buildscript {
+      maven { url "https://raw.github.com/Raizlabs/Broker/archives" }
+}
+
+```
+
+Add this line to your build.gradle, using the [apt plugin](https://bitbucket.org/hvisser/android-apt)
+
+```groovy
+
+dependencies {
+  apt 'com.raizlabs.android:Broker-Compiler:1.0.+'
+  compile 'com.raizlabs.android:Broker-Core:1.0.+'
+  compile 'com.raizlabs.android:Broker: 1.0.+'
+
+}
+
+
+```
+
 ### Locally: 
 
-Add this line to your build.gradle:
+Add the ```request_project_prefix``` to your ```gradle.properties``` file, to elminate the need to fork and change the build.gradle of the project.
+
+Add these lines to your build.gradle:
 
 ```groovy
 
   dependencies {
-    compile project(":Libraries:Broker")
+    apt project(request_project_prefix + "Broker-Compiler")
+    compile project(request_project_prefix + "Broker-Core")
+    compile project(request_project_prefix + "Broker")
   }
 
 ```
-
-### Remotely
-
-Coming soon
 
 ## Usage
 
