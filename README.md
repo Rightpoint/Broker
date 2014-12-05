@@ -1,6 +1,6 @@
 # Broker
 
-A façade between executing requests and creating them. The library provides an interface for creating requests, but delegates the actual execution to ```RequestExecutors```. 
+A façade between executing requests and creating them. The library provides an interface for creating requests, but delegates the actual execution to ```RequestExecutors```. It also generates REST services for you using **annotation processing**.
 
 
 ## Getting Started
@@ -12,7 +12,7 @@ Add this line to your build.gradle:
 ```groovy
 
   dependencies {
-    compile project(":Libraries:Request")
+    compile project(":Libraries:Broker")
   }
 
 ```
@@ -51,6 +51,22 @@ private RequestCallback<JSONObject> mRequestCallback = new RequestCallback<JSONO
     };
 
 ```
+
+### Request and Request.Builder
+
+This is the main object that we use to execute our requests. It requires the following:
+
+1. ```UrlProvider``` : an interface that makes it easy to specify a method, base url, and end url. Simple implementation is the ```SimpleUrlProvider```. 
+2. ```RequestExecutor``` : actually handles the request and is up to the executor how the request is run. 
+3. A predefined ``ResponseType`` that must match the ```ResponseHandler```'s return type.
+
+Supports:
+
+1. Custom contentTypes
+2. Adding a body to the request
+3. Url Params
+4. Request headers
+5. Adding metadata to attach to the specific request
 
 ### REST Interfaces
 
@@ -121,29 +137,12 @@ Within the function parameters, we must use annotations to specify what paramete
 
 ```
 
-### Request and Request.Builder
-
-This is the main object that we use to execute our requests. It requires the following:
-
-1. **UrlProvider**
-2. **RequestExecutor**
-3. A predefined **ResponseType** that matches the **ResponseHandler**'s return type.
-
-Supports:
-
-1. Custom contentTypes
-2. Adding a body to the request
-3. Url Params
-4. Request headers
-5. Adding metadata to attach to the specific request
-
-
 ### UrlProvider
 It enables enums and other classes to provide a url for the request in a standardized fashion.
 
 #### Example
 
-This is an example from Costco, where we define a base url that the other enum objects use in combination with its own defined endpoint. Works very well with REST APIs.
+This is an example, where we define a base url that the other enum objects use in combination with its own defined endpoint. Works very well with REST APIs, or swapping between different endpoints.
 
 ```java
 
@@ -164,7 +163,7 @@ private enum AppUrlProvider implements UrlProvider {
 
         @Override
         public String getBaseUrl() {
-            return "https://mobilecontent.costco.com/";
+            return "https://www.someurl.com/";
         }
 
         @Override
@@ -179,7 +178,7 @@ private enum AppUrlProvider implements UrlProvider {
 
 ### RequestCallback
 
-The main response interface that gets called when the request finishes. ```onRequestDone(ResponseType response)``` is for a success and ```onRequestError(Throwable error, String stringError)``` is meant for failures. 
+The main response interface that gets called when the request finishes. ```onRequestDone(ResponseType response)``` is for a success and ```onRequestError(Throwable error, String stringError)``` is meant for failures. The parameter of this callback **MUST** match the return type of the ```ResponseHandler```.
 
 #### Example
 
@@ -209,9 +208,11 @@ Override the ```execute(Request request)``` method and handle the data that is p
 
 ### ResponseHandlers
 
-ResponseHandlers define how to convert a response into another. It's ```ResponseType``` should match the **RequestCallback**s type-param. 
+ResponseHandlers define how to convert a response into another. It's ```ResponseType``` should match the ```RequestCallback```'s type-param. 
 
 #### Example
+
+Using our other library, [Parser](https://github.com/Raizlabs/Parser) (which also uses annotation processing, for parsing data into objects) this response handler converts the string data into an ```AppConfig``` object. 
 
 Example of converting a string into an ```AppConfig``` object. 
 
@@ -221,15 +222,7 @@ private class ParserResponseHandler implements ResponseHandler<String, AppConfig
 
         @Override
         public AppConfig processResponse(String s) {
-            AppConfig appConfig = null;
-            try {
-                JSONObject appJson = new JSONObject(s);
-                appConfig = parser.parse(AppConfig.class, appJson);
-            } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
-            } finally {
-                return appConfig;
-            }
+                return ParserHolder.parse(AppConfig.class, new JSONObject(s));
         }
     }
 
