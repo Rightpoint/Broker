@@ -1,7 +1,4 @@
 apply plugin: 'com.android.library'
-if(project.getTasks().findByPath("artifactoryPublish") != null) {
-    apply plugin: 'com.raizlabs.artifactorypublisher'
-}
 apply plugin: 'android-apt'
 
 android {
@@ -11,33 +8,15 @@ android {
     defaultConfig {
         minSdkVersion 3
         targetSdkVersion 21
-        versionName = version.replace("-SNAPSHOT", "")
-        versionCode = Integer.parseInt(versionName.replace(".", ""))
     }
 }
 
 dependencies {
     androidTestApt project(request_project_prefix + 'Broker-Compiler')
-
-    compile 'com.raizlabs.android:Broker-Core:1.0.1'
+    compile project(request_project_prefix + "Broker-Core")
 
     compile files('libs/volley.jar')
 
 }
 
 apply from: '../github_deploy.gradle'
-
-if(project.getTasks().findByPath("artifactoryPublish") != null) {
-    artifactoryPublish.dependsOn {
-        androidSourcesJar
-    }
-
-    task androidSourcesJar(type: Jar) {
-        classifier = 'sources'
-        from android.sourceSets.main.java.sourceFiles
-    }
-
-    artifacts {
-        archives androidSourcesJar
-    }
-}

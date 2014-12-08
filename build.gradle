@@ -2,30 +2,18 @@ buildscript {
     repositories {
         mavenCentral()
         maven { url 'http://dl.bintray.com/jfrog/jfrog-jars' }
-        maven {
-            url "${artifactory_contextUrl}/android-dev"
-            credentials {
-                username = "${artifactory_user}"
-                password = "${artifactory_password}"
-            }
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
-
-        if(project.getTasks().findByPath("artifactoryPublish") != null) {
-            classpath 'com.raizlabs.android-modules:artifactorypublisher:1.0.0'
-            classpath "org.jfrog.buildinfo:build-info-extractor-gradle:2.2.5"
-        }
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
     }
 }
 
 allprojects {
+    version = VERSION_NAME
+    group = GROUP
+
     repositories {
         mavenCentral()
-        maven {
-            url uri('../archives')
-        }
     }
 }
