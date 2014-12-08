@@ -4,7 +4,7 @@ targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
-    compile 'com.raizlabs.android:Broker-Core:1.0.0'
+    compile 'com.raizlabs.android:Broker-Core:1.0.1'
     compile 'com.squareup:javawriter:2.5.0'
     compile 'com.google.auto.service:auto-service:1.0+'
 }

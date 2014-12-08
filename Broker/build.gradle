@@ -20,7 +20,7 @@ android {
 dependencies {
     androidTestApt project(request_project_prefix + 'Broker-Compiler')
 
-    compile 'com.raizlabs.android:Broker-Core:1.0.0'
+    compile 'com.raizlabs.android:Broker-Core:1.0.1'
 
     compile files('libs/volley.jar')
 
