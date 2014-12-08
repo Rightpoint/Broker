@@ -24,5 +24,8 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
+        maven {
+            url uri('../archives')
+        }
     }
 }

@@ -8,7 +8,7 @@
   <packaging>aar</packaging>
   <dependencies>
     <dependency>
-      <groupId>Broker</groupId>
+      <groupId>com.raizlabs.android</groupId>
       <artifactId>Broker-Core</artifactId>
       <version>1.0.0</version>
       <scope>compile</scope>
