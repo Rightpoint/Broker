@@ -13,7 +13,7 @@ Add the repo as a maven url to your classpath:
 
 buildscript {
       repositories {
-            maven { url "https://raw.github.com/Raizlabs/maven-releases/releases" }
+        maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
       }
 }
 
