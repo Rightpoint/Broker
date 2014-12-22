@@ -1,3 +1,5 @@
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Broker-red.svg?style=flat)](https://android-arsenal.com/details/1/1256) [![Raizlabs Repository](http://img.shields.io/badge/Raizlabs%20Repository-1.0.0-blue.svg?style=flat)](https://github.com/Raizlabs/maven-releases)
+
 # Broker
 
 A façade between executing requests and creating them. The library provides an interface for creating requests, but delegates the actual execution to ```RequestExecutors```. It also generates REST services for you using **annotation processing**.
