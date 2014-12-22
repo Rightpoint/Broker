@@ -19,14 +19,18 @@ buildscript {
 
 ```
 
-Add this line to your build.gradle, using the [apt plugin](https://bitbucket.org/hvisser/android-apt)
+Add this line to your build.gradle, using the [apt plugin](https://bitbucket.org/hvisser/android-apt) and the 
+[AARLinkSources](https://github.com/xujiaao/AARLinkSources) plugin:
 
 ```groovy
 
 dependencies {
-  apt 'com.raizlabs.android:Broker-Compiler:1.0.+'
-  compile 'com.raizlabs.android:Broker-Core:1.0.+'
-  compile 'com.raizlabs.android:Broker: 1.0.+'
+  apt 'com.raizlabs.android:Broker-Compiler:1.0.0'
+  aarLinkSources 'com.raizlabs.android:Broker-Compiler:1.0.0:sources@jar'
+  compile 'com.raizlabs.android:Broker-Core:1.0.0'
+  aarLinkSources 'com.raizlabs.android:Broker-Core:1.0.0:sources@jar'
+  compile 'com.raizlabs.android:Broker: 1.0.0'
+  aarLinkSources 'com.raizlabs.android:Broker:1.0.0:sources@jar'
 
 }
 
