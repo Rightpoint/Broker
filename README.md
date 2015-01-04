@@ -104,7 +104,7 @@ Supports:
 
 ### REST Interfaces
 
-This library supports annotation processing for generating ```$RestService``` classes that contain all of the code of constructing the intended request. This is similar to [Retrofit](http://square.github.io/retrofit/), however that library uses reflection to generate requests, causing it to be very __slow__. We use annotation processing since it is **transparent** (can read the code that is generated), and as fast as native when executed. 
+This library supports annotation processing for generating ```$RestService``` classes that contain all of the code of constructing the intended request. We use annotation processing since it is **transparent** (can read the code that is generated), and as fast as native when executed. 
 
 Each REST interface must be an __interface__ since the generated code has a base class.
 
