@@ -8,9 +8,13 @@ android {
         minSdkVersion 3
         targetSdkVersion 21
     }
+
+
 }
 
 dependencies {
+    compile files('libs/volley.jar')
+    compile project(request_project_prefix + "Broker")
     compile project(request_project_prefix + "Broker-Core")
 }
 

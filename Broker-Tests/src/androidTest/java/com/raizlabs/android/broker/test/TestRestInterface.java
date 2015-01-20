@@ -41,5 +41,5 @@ public interface TestRestInterface  {
     public void fetchAllComments(JsonArrayCallback callback);
 
     @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
-    public void fetchData(@Endpoint String firstLevel, @Endpoint String secondLevel);
+    public void fetchData(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel);
 }

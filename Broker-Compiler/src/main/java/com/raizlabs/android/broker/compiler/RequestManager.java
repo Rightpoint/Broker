@@ -53,8 +53,8 @@ public class RequestManager implements Definition{
         processingEnvironment.getMessager().printMessage(Diagnostic.Kind.ERROR, t.getMessage());
     }
 
-    public void logError(String error) {
-        processingEnvironment.getMessager().printMessage(Diagnostic.Kind.ERROR, error);
+    public void logError(String error, Object...args) {
+        processingEnvironment.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format(error, args));
     }
 
     @Override

@@ -1,1 +1,1 @@
-include ':Broker', ':Broker-Compiler', ':Broker-Core', ':app'
+include ':Broker', ':Broker-Compiler', ':Broker-Core', ':app', ':Broker-Tests', 'Broker-Volley'

@@ -142,6 +142,9 @@ public class RestMethodDefinition implements Definition {
                 String param = replaceParams.get(i);
                 newUrl = newUrl.replaceFirst("\\{" + param + "\\}", "\" + " + endpoints.get(param) + " + \"");
             }
+        } else {
+            requestManager.logError("Parameters for %1s did not match the count of the endpoints defined. " +
+                    "Please fix and try again", elementName);
         }
 
         url = newUrl;

@@ -5,6 +5,7 @@ import android.test.AndroidTestCase;
 import com.raizlabs.android.broker.RequestCallback;
 import com.raizlabs.android.broker.RequestConfig;
 import com.raizlabs.android.broker.RequestManager;
+import com.raizlabs.android.broker.volley.VolleyExecutor;
 import com.raizlabs.synchronization.OneShotLock;
 
 import org.json.JSONArray;
@@ -22,7 +23,7 @@ public class TestRestTest extends AndroidTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        RequestConfig.init(getContext());
+        RequestConfig.init(getContext(), VolleyExecutor.getSharedExecutor());
     }
 
     public void testRestInterface() {
@@ -36,6 +37,9 @@ public class TestRestTest extends AndroidTestCase {
         mRequestLock.waitUntilUnlocked();
 
         restInterface.fetchAllPosts(getArrayReponse());
+        mRequestLock.waitUntilUnlocked();
+
+        restInterface.fetchData(TestRestInterface.POSTS, "1", TestRestInterface.COMMENTS);
         mRequestLock.waitUntilUnlocked();
     }
 
