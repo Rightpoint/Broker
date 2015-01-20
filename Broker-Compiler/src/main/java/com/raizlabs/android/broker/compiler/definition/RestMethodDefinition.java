@@ -2,6 +2,7 @@ package com.raizlabs.android.broker.compiler.definition;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.raizlabs.android.broker.compiler.Classes;
 import com.raizlabs.android.broker.compiler.RequestManager;
 import com.raizlabs.android.broker.compiler.RequestUtils;
 import com.raizlabs.android.broker.compiler.RestParameterMatcher;
@@ -24,7 +25,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 
 /**
  * Author: andrewgrosner
@@ -60,6 +63,10 @@ public class RestMethodDefinition implements Definition {
 
     Map<String, Param> urlParams;
 
+    VariableElement callbackParam;
+
+    String requestCallbackName = "null";
+
     public RestMethodDefinition(RequestManager requestManager, Element inElement) {
         this.requestManager = requestManager;
         method = inElement.getAnnotation(Method.class);
@@ -90,12 +97,31 @@ public class RestMethodDefinition implements Definition {
 
         for (int i = 0; i < paramCouples.length; i += 2) {
             VariableElement variableElement = params.get(i / 2);
+            Element scrubbed = requestManager.getTypeUtils().asElement(requestManager.getTypeUtils().erasure(variableElement.asType()));
             TypeMirror type = variableElement.asType();
             String name = variableElement.getSimpleName().toString();
             paramCouples[i + 1] = name;
             paramCouples[i] = type.toString();
 
-            if (variableElement.getAnnotation(Endpoint.class) != null) {
+            // determine if requestcallback is a superclass of the param
+            boolean isCallback = false;
+            Types types = requestManager.getTypeUtils();
+            DeclaredType callbackType = requestManager.getTypeUtils().getDeclaredType(requestManager.getElements().getTypeElement(Classes.REQUEST_CALLBACK),
+                    types.getWildcardType(null, null));
+
+            for(TypeMirror superType: types.directSupertypes(variableElement.asType())) {
+                if(types.isAssignable(superType, callbackType)) {
+                    isCallback = true;
+                    break;
+                }
+            }
+            isCallback = isCallback || (scrubbed != null && RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_CALLBACK, scrubbed));
+
+            // prioritize callbacks
+            if(isCallback) {
+                callbackParam = variableElement;
+                requestCallbackName = callbackParam.getSimpleName().toString();
+            } else if (variableElement.getAnnotation(Endpoint.class) != null) {
                 endpoints.put(name, name);
             } else if (variableElement.getAnnotation(Header.class) != null) {
                 Header header = variableElement.getAnnotation(Header.class);
@@ -166,7 +192,7 @@ public class RestMethodDefinition implements Definition {
                         }
 
                         builder.appendUrlParams(urlParams);
-                        builder.appendEmpty().appendBuild();
+                        builder.appendEmpty().appendBuild(requestCallbackName);
 
                         javaWriter.emitStatement(builder.getStatement());
 

@@ -43,8 +43,8 @@ public class RequestStatementBuilder  {
         return mBuilder.toString();
     }
 
-    public RequestStatementBuilder appendBuild() {
-        mBuilder.append(".build(requestCallback)");
+    public RequestStatementBuilder appendBuild(String requestVariableName) {
+        mBuilder.append(String.format(".build(%1s)", requestVariableName));
         return this;
     }
 

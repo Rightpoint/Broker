@@ -15,6 +15,7 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 /**
@@ -42,6 +43,10 @@ public class RequestManager implements Definition{
 
     public ProcessingEnvironment getProcessingEnvironment() {
         return processingEnvironment;
+    }
+
+    public Types getTypeUtils() {
+        return processingEnvironment.getTypeUtils();
     }
 
     public void logError(Throwable t) {

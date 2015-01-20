@@ -269,7 +269,10 @@ public class Request<ResponseType> implements UrlProvider{
      */
     public static class Builder<ResponseType> {
 
-        private Request<ResponseType> mRequest;
+        protected Request<ResponseType> mRequest;
+
+        protected Builder(){
+        }
 
         /**
          * Contructs the contained {@link com.raizlabs.android.broker.Request} with a
@@ -277,7 +280,7 @@ public class Request<ResponseType> implements UrlProvider{
          * @param requestExecutor
          */
         public Builder(RequestExecutor requestExecutor) {
-            mRequest = new Request<ResponseType>(requestExecutor);
+            mRequest = new Request<>(requestExecutor);
         }
 
         /**

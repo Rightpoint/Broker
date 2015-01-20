@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.raizlabs.android.broker.test" >
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.raizlabs.android.broker.test">
 
-    <application />
+    <uses-sdk android:minSdkVersion="8"
+              tools:overrideLibrary="com.raizlabs.baseutils"
+        />
+    <application
+
+        />
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="com.raizlabs.android.request.test" />
+        tools:replace="android:targetPackage"
+        android:targetPackage="com.raizlabs.android.broker.test" />
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
