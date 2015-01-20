@@ -3,9 +3,7 @@ package com.raizlabs.android.broker;
 import com.raizlabs.android.broker.rest.RestAdapter;
 
 /**
- * Author: andrewgrosner
- * Contributors: { }
- * Description:
+ * Description: The interface to the generated adapter class to retrieve RestInterface classes.
  */
 public class RequestManager {
 

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Description:
+ * Description: Provides some handy methods for formatting and encoding urls
  */
 public class RequestUtils {
 

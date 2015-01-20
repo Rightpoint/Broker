@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Author: andrewgrosner
- * Contributors: { }
  * Description: Meant for internal use, all interfaces with the RestInterface annotation will generate
  * a class that extends this class.
  */
