@@ -25,6 +25,11 @@ public class BrokerWebServiceRequest<ResultType> extends BaseWebServiceRequest<R
 
     private final Request<ResultType> mRequest;
 
+    /**
+     * Constructs a new broker webservice request with our {@link com.raizlabs.android.broker.Request} object.
+     *
+     * @param request
+     */
     public BrokerWebServiceRequest(Request<ResultType> request) {
         mBuilder = new RequestBuilder(WebServiceManagerUtils.convertMethodIntToMethod(request.getMethod()),
                 request.getFullUrl());
@@ -57,6 +62,11 @@ public class BrokerWebServiceRequest<ResultType> extends BaseWebServiceRequest<R
         return (ResultType) mRequest.getResponseHandler().handleResponse(response.getContentAsString());
     }
 
+    /**
+     * Executes this request on the specified {@link com.raizlabs.android.broker.webservicemanager.WebServiceManagerExecutor}
+     *
+     * @param executor The executor to run
+     */
     public void execute(final WebServiceManagerExecutor executor) {
         executor.addRequest(this);
         executor.getWebServiceManager().doRequestInBackground(this, new WebServiceRequestListener<ResultType>() {
