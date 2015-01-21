@@ -67,10 +67,35 @@ public class RestMethodDefinition implements Definition {
 
     String requestCallbackName = "null";
 
+    boolean returnsRequest = false;
+
+    boolean returnsRequestBuilder = false;
+
     public RestMethodDefinition(RequestManager requestManager, Element inElement) {
         this.requestManager = requestManager;
         method = inElement.getAnnotation(Method.class);
         element = (ExecutableElement) inElement;
+
+        Types types = requestManager.getTypeUtils();
+        DeclaredType callbackType = requestManager.getDeclaredType(Classes.REQUEST_CALLBACK,
+                types.getWildcardType(null, null));
+        DeclaredType requestType = requestManager.getDeclaredType(Classes.REQUEST,
+                types.getWildcardType(null, null));
+        DeclaredType requestTypeBuilder = requestManager.getDeclaredType(Classes.REQUEST_BUILDER,
+                types.getWildcardType(null, null));
+
+        Element returnType = requestManager.getTypeUtils().asElement(element.getReturnType());
+        if (returnType != null) {
+            returnsRequest = RequestUtils.implementsClassSuper(types, requestType, returnType)
+                    || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST, returnType);
+
+            if(!returnsRequest) {
+                returnsRequestBuilder = RequestUtils.implementsClassSuper(types, requestTypeBuilder, returnType)
+                        || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_BUILDER, returnType);
+            }
+
+        }
+
         elementName = element.getSimpleName().toString();
 
         url = method.url();
@@ -104,18 +129,10 @@ public class RestMethodDefinition implements Definition {
             paramCouples[i] = type.toString();
 
             // determine if requestcallback is a superclass of the param
-            boolean isCallback = false;
-            Types types = requestManager.getTypeUtils();
-            DeclaredType callbackType = requestManager.getTypeUtils().getDeclaredType(requestManager.getElements().getTypeElement(Classes.REQUEST_CALLBACK),
-                    types.getWildcardType(null, null));
 
-            for(TypeMirror superType: types.directSupertypes(variableElement.asType())) {
-                if(types.isAssignable(superType, callbackType)) {
-                    isCallback = true;
-                    break;
-                }
-            }
-            isCallback = isCallback || (scrubbed != null && RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_CALLBACK, scrubbed));
+
+            boolean isCallback = RequestUtils.implementsClassSuper(types, callbackType, variableElement)
+                    || (scrubbed != null && RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_CALLBACK, scrubbed));
 
             // prioritize callbacks
             if(isCallback) {
@@ -157,8 +174,8 @@ public class RestMethodDefinition implements Definition {
                 Sets.newHashSet(Modifier.PUBLIC, Modifier.FINAL), new Definition() {
                     @Override
                     public void write(JavaWriter javaWriter) throws IOException {
-                        RequestStatementBuilder builder = new RequestStatementBuilder().appendEmpty()
-                                .appendRequest().appendEmpty()
+                        RequestStatementBuilder builder = new RequestStatementBuilder(!returnsRequestBuilder)
+                                .appendEmpty().appendRequest().appendEmpty()
                                 .appendResponseHandler(responseHandler).appendEmpty();
                         if (!headers.isEmpty()) {
                             builder.appendHeaders(headers).appendEmpty();
@@ -195,11 +212,21 @@ public class RestMethodDefinition implements Definition {
                         }
 
                         builder.appendUrlParams(urlParams);
-                        builder.appendEmpty().appendBuild(requestCallbackName);
+                        builder.appendEmpty();
+
+                        if(!returnsRequestBuilder) {
+                            builder.appendBuild(requestCallbackName);
+                        }
 
                         javaWriter.emitStatement(builder.getStatement());
 
-                        javaWriter.emitStatement("request.execute()");
+                        if(!returnsRequest && !returnsRequestBuilder) {
+                            javaWriter.emitStatement("request.execute()");
+                        } else if(returnsRequest) {
+                            javaWriter.emitStatement("return request");
+                        } else if(returnsRequestBuilder) {
+                            javaWriter.emitStatement("return requestBuilder");
+                        }
                     }
                 }, paramCouples);
     }

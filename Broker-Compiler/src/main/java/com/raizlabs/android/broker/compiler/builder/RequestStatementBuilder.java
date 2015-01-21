@@ -15,8 +15,8 @@ public class RequestStatementBuilder  {
 
     private StringBuilder mBuilder = new StringBuilder();
 
-    public RequestStatementBuilder() {
-        append("Request request = ");
+    public RequestStatementBuilder(boolean request) {
+        append(request ? "Request request = " : "Request.Builder requestBuilder = ");
     }
 
     public RequestStatementBuilder appendEmpty() {

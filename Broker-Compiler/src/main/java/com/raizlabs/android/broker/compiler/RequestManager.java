@@ -7,6 +7,7 @@ import com.raizlabs.android.broker.compiler.definition.RestServiceDefinition;
 import com.squareup.javawriter.JavaWriter;
 
 import java.io.IOException;
+import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +15,8 @@ import java.util.Set;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
@@ -94,5 +97,9 @@ public class RequestManager implements Definition{
 
     public Filer getFiler() {
         return processingEnvironment.getFiler();
+    }
+
+    public DeclaredType getDeclaredType(String fqTn, TypeMirror...typeArgs) {
+        return getTypeUtils().getDeclaredType(getElements().getTypeElement(fqTn), typeArgs);
     }
 }

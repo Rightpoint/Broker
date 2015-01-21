@@ -1,5 +1,6 @@
 package com.raizlabs.android.broker.test;
 
+import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
 import com.raizlabs.android.broker.core.Body;
 import com.raizlabs.android.broker.core.Endpoint;
@@ -42,4 +43,15 @@ public interface TestRestInterface  {
 
     @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
     public void fetchData(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel);
+
+    @Method(url = POSTS + "/{userId}", method = Method.PUT)
+    @ResponseHandler(SimpleJsonResponseHandler.class)
+    public void updateCommentsWithUserId(@Body String putData, @Endpoint String userId, RequestCallback<JSONObject> requestCallback);
+
+    @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
+    @ResponseHandler(SimpleJsonResponseHandler.class)
+    public Request<JSONObject> getFetchDataRequest(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel);
+
+    @Method(url = COMMENTS)
+    public Request.Builder<JSONObject> getCommentsRequestBuilder();
 }
