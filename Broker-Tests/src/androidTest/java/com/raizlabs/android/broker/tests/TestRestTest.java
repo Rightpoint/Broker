@@ -31,7 +31,14 @@ public class TestRestTest extends AndroidTestCase {
     }
 
     public void testRestInterface() {
-        TestRestInterface restInterface = RequestManager.getRestInterface(TestRestInterface.class);
+        testBaseRestInterface(RequestManager.getRestInterface(TestRestInterface.class));
+    }
+
+    public void testWebServiceManager() {
+        testBaseRestInterface(RequestManager.getRestInterface(TestWSMInterface.class));
+    }
+
+    private void testBaseRestInterface(TestRestInterface restInterface) {
         assertNotNull(restInterface);
 
         restInterface.fetchPostsByUserId(1, getArrayReponse());
