@@ -1,5 +1,6 @@
 package com.raizlabs.android.broker;
 
+import com.raizlabs.android.broker.core.Priority;
 import com.raizlabs.android.broker.metadata.RequestMetadataGenerator;
 import com.raizlabs.android.broker.multipart.RequestEntityPart;
 import com.raizlabs.android.broker.responsehandler.ResponseHandler;
@@ -87,6 +88,11 @@ public class Request<ResponseType> implements UrlProvider {
     private final Map<String, RequestEntityPart> mPartMap = new LinkedHashMap<>();
 
     /**
+     * The priority this request runs at
+     */
+    private Priority mPriority = Priority.NORMAL;
+
+    /**
      * @param requestExecutor
      */
     Request(RequestExecutor requestExecutor) {
@@ -100,6 +106,15 @@ public class Request<ResponseType> implements UrlProvider {
      */
     void setUrlProvider(UrlProvider urlProvider) {
         mProvider = urlProvider;
+    }
+
+    /**
+     * Sets a priority for this request.
+     *
+     * @param mPriority The priority value to assign.
+     */
+    void setPriority(Priority mPriority) {
+        this.mPriority = mPriority;
     }
 
     /**
@@ -275,6 +290,13 @@ public class Request<ResponseType> implements UrlProvider {
     }
 
     /**
+     * @return Priority that this request will run at.
+     */
+    public Priority getPriority() {
+        return mPriority;
+    }
+
+    /**
      * @return True if this request has parts defined for it.
      */
     public boolean isMultiPart() {
@@ -355,6 +377,11 @@ public class Request<ResponseType> implements UrlProvider {
          */
         public Builder<ResponseType> provider(UrlProvider urlProvider) {
             mRequest.setUrlProvider(urlProvider);
+            return this;
+        }
+
+        public Builder<ResponseType> priority(Priority priority) {
+            mRequest.setPriority(priority);
             return this;
         }
 

@@ -75,4 +75,8 @@ public @interface Method {
      */
     Header[] headers() default {};
 
+    /**
+     * @return The priority for this method's request.
+     */
+    Priority priority() default Priority.NORMAL;
 }

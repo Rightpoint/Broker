@@ -48,6 +48,11 @@ public class BrokerVolleyRequest extends StringRequest {
     }
 
     @Override
+    public Priority getPriority() {
+        return ((VolleyExecutor)mRequest.getExecutor()).convertPriority(mRequest.getPriority());
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public Map<String, String> getHeaders() throws AuthFailureError {
         Map<String, String> headers = mRequest.getHeaders();

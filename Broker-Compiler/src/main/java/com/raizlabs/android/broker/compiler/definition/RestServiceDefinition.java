@@ -97,7 +97,8 @@ public class RestServiceDefinition extends BaseDefinition {
                 Classes.RESPONSE_HANDLER,
                 Classes.REQUEST_EXECUTOR,
                 Classes.METHOD,
-                Classes.REQUEST
+                Classes.REQUEST,
+                Classes.PRIORITY
         };
     }
 

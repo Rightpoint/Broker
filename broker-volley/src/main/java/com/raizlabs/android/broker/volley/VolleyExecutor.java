@@ -7,6 +7,7 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpClientStack;
 import com.android.volley.toolbox.Volley;
+import com.raizlabs.android.broker.core.Priority;
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
 import com.raizlabs.android.broker.RequestConfig;
@@ -136,5 +137,20 @@ public class VolleyExecutor implements RequestExecutor<String> {
                 }
             });
         }
+    }
+
+    @Override
+    public com.android.volley.Request.Priority convertPriority(Priority priority) {
+        switch (priority) {
+            case IMMEDIATE:
+                return com.android.volley.Request.Priority.IMMEDIATE;
+            case HIGH:
+                return com.android.volley.Request.Priority.HIGH;
+            case NORMAL:
+                return com.android.volley.Request.Priority.NORMAL;
+            case LOW:
+                return com.android.volley.Request.Priority.LOW;
+        }
+        return null;
     }
 }

@@ -3,6 +3,7 @@ package com.raizlabs.android.broker.compiler.builder;
 import com.raizlabs.android.broker.compiler.Classes;
 import com.raizlabs.android.broker.core.Param;
 import com.raizlabs.android.broker.core.Part;
+import com.raizlabs.android.broker.core.Priority;
 
 import java.util.Map;
 import java.util.Set;
@@ -111,5 +112,9 @@ public class RequestStatementBuilder  {
             }
         }
         return this;
+    }
+
+    public RequestStatementBuilder appendPriority(Priority priority) {
+        return append(String.format(".priority(Priority.%1s)", priority.name()));
     }
 }

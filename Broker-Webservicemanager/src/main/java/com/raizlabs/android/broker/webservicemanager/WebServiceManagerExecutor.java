@@ -1,7 +1,9 @@
 package com.raizlabs.android.broker.webservicemanager;
 
+import com.raizlabs.android.broker.core.Priority;
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestExecutor;
+import com.raizlabs.concurrent.Prioritized;
 import com.raizlabs.net.webservicemanager.WebServiceManager;
 
 import java.util.ArrayList;
@@ -71,5 +73,20 @@ public class WebServiceManagerExecutor implements RequestExecutor<Void> {
             }
             mRequests.clear();
         }
+    }
+
+    @Override
+    public Integer convertPriority(Priority priority) {
+        switch (priority) {
+            case IMMEDIATE:
+                return Prioritized.Priority.IMMEDIATE;
+            case HIGH:
+                return Prioritized.Priority.FOREGROUND;
+            case NORMAL:
+                return Prioritized.Priority.NORMAL;
+            case LOW:
+                return Prioritized.Priority.BACKGROUND;
+        }
+        return null;
     }
 }

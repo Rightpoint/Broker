@@ -9,6 +9,11 @@ android {
         minSdkVersion 3
         targetSdkVersion 21
     }
+
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
 }
 
 dependencies {

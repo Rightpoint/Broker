@@ -34,4 +34,6 @@ public class Classes {
     public static final String REQUEST = REQUEST_PACKAGE + ".Request";
 
     public static final String REQUEST_CALLBACK = REQUEST_PACKAGE + ".RequestCallback";
+
+    public static final String PRIORITY = REQUEST_PACKAGE + ".core.Priority";
 }

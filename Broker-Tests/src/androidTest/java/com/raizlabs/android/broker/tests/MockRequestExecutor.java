@@ -4,6 +4,7 @@ import com.raizlabs.android.broker.MockRequest;
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
 import com.raizlabs.android.broker.RequestExecutor;
+import com.raizlabs.android.broker.core.Priority;
 
 /**
  * Description: Provides a very simple mocking interface so we can pretend to return data in tests.
@@ -31,5 +32,10 @@ public class MockRequestExecutor implements RequestExecutor<String> {
     @Override
     public void cancelAllRequests() {
         // Ignored
+    }
+
+    @Override
+    public Priority convertPriority(Priority priority) {
+        return priority;
     }
 }

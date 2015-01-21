@@ -15,6 +15,7 @@ import com.raizlabs.android.broker.core.Metadata;
 import com.raizlabs.android.broker.core.Method;
 import com.raizlabs.android.broker.core.Param;
 import com.raizlabs.android.broker.core.Part;
+import com.raizlabs.android.broker.core.Priority;
 import com.raizlabs.android.broker.core.ResponseHandler;
 import com.squareup.javawriter.JavaWriter;
 
@@ -74,6 +75,8 @@ public class RestMethodDefinition implements Definition {
 
     boolean returnsRequestBuilder = false;
 
+    Priority priority;
+
     public RestMethodDefinition(RequestManager requestManager, Element inElement) {
         this.requestManager = requestManager;
         method = inElement.getAnnotation(Method.class);
@@ -102,6 +105,7 @@ public class RestMethodDefinition implements Definition {
         elementName = element.getSimpleName().toString();
 
         url = method.url();
+        priority = method.priority();
 
         // add leading slash if missing
         if(url != null && url.length() > 0 && !url.startsWith("/")) {
@@ -224,6 +228,7 @@ public class RestMethodDefinition implements Definition {
                         builder.appendUrlParams(urlParams);
                         builder.appendParts(partMap);
                         builder.appendEmpty();
+                        builder.appendPriority(priority);
 
                         if(!returnsRequestBuilder) {
                             builder.appendBuild(requestCallbackName);
