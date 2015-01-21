@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * This is the basic implementation of using our {@link com.raizlabs.android.broker.Request} library
  */
-public class VolleyRequest extends StringRequest {
+public class BrokerVolleyRequest extends StringRequest {
 
     /**
      * The request that use when certain Volley methods are called.
@@ -31,34 +31,25 @@ public class VolleyRequest extends StringRequest {
      * @param listener      - the listener for a response
      * @param errorListener - the listener for an error
      */
-    public VolleyRequest(Request request, int method, String url, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        super(method, url, listener, errorListener);
+    public BrokerVolleyRequest(Request request, String url, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        super(request.getMethod(), url, listener, errorListener);
         mRequest = request;
     }
 
-    public VolleyRequest(Request request, String url, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        super(url, listener, errorListener);
-        mRequest = request;
-    }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, String> getHeaders() throws AuthFailureError {
         Map<String, String> headers = mRequest.getHeaders();
         if (headers == null)
-            headers = new HashMap<String, String>();
+            headers = new HashMap<>();
         return headers;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, String> getParams() {
         return mRequest.getParams();
-    }
-
-    @Override
-    protected Response<String> parseNetworkResponse(NetworkResponse response) {
-        Response<String> responseString = super.parseNetworkResponse(response);
-        mRequest.getResponseHandler().processResponse(responseString.result);
-        return responseString;
     }
 
     @Override

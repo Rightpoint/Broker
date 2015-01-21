@@ -1,6 +1,7 @@
 package com.raizlabs.android.broker.tests;
 
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestConfig;
@@ -10,6 +11,8 @@ import com.raizlabs.android.broker.responsehandler.SimpleJsonArrayResponseHandle
 import com.raizlabs.android.broker.responsehandler.SimpleJsonResponseHandler;
 import com.raizlabs.android.broker.rest.BaseRestInterface;
 import com.raizlabs.android.broker.volley.VolleyExecutor;
+import com.raizlabs.android.broker.webservicemanager.WebServiceManagerExecutor;
+import com.raizlabs.net.webservicemanager.WebServiceManager;
 import com.raizlabs.synchronization.OneShotLock;
 
 import org.json.JSONArray;
@@ -30,30 +33,34 @@ public class TestRestTest extends AndroidTestCase {
         RequestConfig.init(getContext(), VolleyExecutor.getSharedExecutor());
     }
 
-    public void testRestInterface() {
+    public void testVolley() {
         testBaseRestInterface(RequestManager.getRestInterface(TestRestInterface.class));
     }
 
     public void testWebServiceManager() {
-        testBaseRestInterface(RequestManager.getRestInterface(TestWSMInterface.class));
+        TestRestInterface restInterface = RequestManager.getRestInterface(TestWSMInterface.class);
+        testBaseRestInterface(restInterface);
+
+        BaseRestInterface baseRestInterface = ((BaseRestInterface) restInterface);
+        WebServiceManagerExecutor managerExecutor = ((WebServiceManagerExecutor) baseRestInterface.getRequestExecutor());
+        WebServiceManager webServiceManager = managerExecutor.getWebServiceManager();
+
+        // Wait for requests, no timeout specified so if requests fail to remove, we will find it here.
+        while (managerExecutor.getActiveRequestSize() != 0) {
+            Log.d(getClass().getSimpleName(), "Waiting for requests: " + managerExecutor.getActiveRequestSize());
+        }
+        assertTrue(managerExecutor.getActiveRequestSize() == 0);
     }
 
     private void testBaseRestInterface(TestRestInterface restInterface) {
         assertNotNull(restInterface);
 
-        restInterface.fetchPostsByUserId(1, getArrayReponse());
-        mRequestLock.waitUntilUnlocked();
-
-        restInterface.fetchAllComments(getArrayReponse());
-        mRequestLock.waitUntilUnlocked();
-
-        restInterface.fetchAllPosts(getArrayReponse());
-        mRequestLock.waitUntilUnlocked();
-
-        restInterface.fetchData(TestRestInterface.POSTS, "1", TestRestInterface.COMMENTS);
-        mRequestLock.waitUntilUnlocked();
-
         BaseRestInterface baseRestInterface = (BaseRestInterface) restInterface;
+
+        String body = "This Is a Put";
+        Request<JSONObject> updateCommentsRequest = restInterface.updateCommentsWithUserId(body, "1", null);
+        assertNotNull(updateCommentsRequest.getBody());
+        assertEquals(body.length(), updateCommentsRequest.getBodyLength());
 
         Request<JSONObject> fetchRequest = restInterface.getFetchDataRequest(TestRestInterface.POSTS, "1", TestRestInterface.COMMENTS);
         assertNotNull(fetchRequest.getBaseUrl());
@@ -70,6 +77,21 @@ public class TestRestTest extends AndroidTestCase {
 
         Request<JSONArray> postsRequest = restInterface.getPostsByUserIdParamRequest(1, 3);
         assertEquals(postsRequest.getFullUrl(), baseRestInterface.getFullBaseUrl() + "/comments?userId=1&id=3");
+
+        restInterface.fetchPostsByUserId(1, getArrayReponse());
+        mRequestLock.waitUntilUnlocked();
+
+        restInterface.fetchAllComments(getArrayReponse());
+        mRequestLock = new OneShotLock();
+        mRequestLock.waitUntilUnlocked();
+
+        restInterface.fetchAllPosts(getArrayReponse());
+        mRequestLock = new OneShotLock();
+        mRequestLock.waitUntilUnlocked();
+
+        restInterface.fetchData(TestRestInterface.POSTS, "1", TestRestInterface.COMMENTS, getArrayReponse());
+        mRequestLock = new OneShotLock();
+        mRequestLock.waitUntilUnlocked();
     }
 
     private JsonArrayCallback getArrayReponse() {

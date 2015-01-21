@@ -99,12 +99,11 @@ public class VolleyExecutor implements RequestExecutor<String> {
         };
 
         String url = request.getUrl();
-        int method = request.getMethod();
-        if(method == Method.GET) {
+        if(request.getMethod() == Method.GET) {
             url = request.getFullUrl();
         }
 
-        com.android.volley.Request volleyRequest = new VolleyRequest(request, method, url, stringListener, errorListener);
+        com.android.volley.Request volleyRequest = new BrokerVolleyRequest(request, url, stringListener, errorListener);
         volleyRequest.setRetryPolicy(mRetryPolicy);
         mQueue.add(volleyRequest);
     }

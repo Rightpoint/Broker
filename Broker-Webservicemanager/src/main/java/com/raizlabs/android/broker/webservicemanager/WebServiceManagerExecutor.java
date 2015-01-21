@@ -1,16 +1,11 @@
 package com.raizlabs.android.broker.webservicemanager;
 
 import com.raizlabs.android.broker.Request;
-import com.raizlabs.android.broker.RequestCallback;
 import com.raizlabs.android.broker.RequestExecutor;
-import com.raizlabs.net.HttpMethod;
-import com.raizlabs.net.requests.BaseWebServiceRequest;
-import com.raizlabs.net.requests.RequestBuilder;
-import com.raizlabs.net.requests.WebServiceRequest;
-import com.raizlabs.net.responses.Response;
-import com.raizlabs.net.webservicemanager.ResultInfo;
 import com.raizlabs.net.webservicemanager.WebServiceManager;
-import com.raizlabs.net.webservicemanager.WebServiceRequestListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Description: Executes the requests using our {@link com.raizlabs.net.webservicemanager.WebServiceManager}.
@@ -19,48 +14,62 @@ public class WebServiceManagerExecutor implements RequestExecutor<Void> {
 
     private WebServiceManager mManager = new WebServiceManager();
 
+    private final List<BrokerWebServiceRequest> mRequests = new ArrayList<>();
+
     public WebServiceManager getWebServiceManager() {
         return mManager;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void execute(final Request request) {
+        BrokerWebServiceRequest brokerWebServiceRequest = new BrokerWebServiceRequest(request);
+        brokerWebServiceRequest.execute(this);
+    }
 
-        final HttpMethod method = WebServiceManagerUtils.convertMethodIntToMethod(request.getMethod());
+    void addRequest(BrokerWebServiceRequest brokerWebServiceRequest) {
+        synchronized (mRequests) {
+            mRequests.add(brokerWebServiceRequest);
+        }
+    }
 
-        WebServiceRequest webServiceRequest = new BaseWebServiceRequest() {
-            @Override
-            protected RequestBuilder getRequestBuilder() {
-                return new RequestBuilder(method, request.getFullUrl());
-            }
+    void removeRequest(BrokerWebServiceRequest brokerWebServiceRequest) {
+        synchronized (mRequests) {
+            mRequests.remove(brokerWebServiceRequest);
+        }
+    }
 
-            @Override
-            protected Object translate(Response response) {
-                return request.getResponseHandler().processResponse(response.getContentAsString());
-            }
-        };
-        mManager.doRequestInBackground(webServiceRequest, new WebServiceRequestListener() {
-            @Override
-            public void onRequestComplete(WebServiceManager manager, ResultInfo result) {
-                RequestCallback callback = request.getCallback();
-                if (callback != null && !result.wasCancelled()) {
-                    if (result.isStatusOK()) {
-                        callback.onRequestDone(result.getResult());
-                    } else {
-                        callback.onRequestError(null, result.getResponseMessage());
-                    }
-                }
-            }
-        });
+    public int getActiveRequestSize() {
+        synchronized (mRequests) {
+            return mRequests.size();
+        }
     }
 
     @Override
     public void cancelRequest(Void aVoid, Request request) {
-
+        synchronized (mRequests) {
+            int removePosition = -1;
+            for (int i = 0; i < mRequests.size(); i++) {
+                BrokerWebServiceRequest brokerWebServiceRequest = mRequests.get(i);
+                if (brokerWebServiceRequest.getRequest().equals(request)) {
+                    removePosition = i;
+                    break;
+                }
+            }
+            if (removePosition != -1) {
+                BrokerWebServiceRequest webServiceRequest = mRequests.remove(removePosition);
+                webServiceRequest.cancel();
+            }
+        }
     }
 
     @Override
     public void cancelAllRequests() {
-
+        synchronized (mRequests) {
+            for (BrokerWebServiceRequest brokerWebServiceRequest : mRequests) {
+                brokerWebServiceRequest.cancel();
+            }
+            mRequests.clear();
+        }
     }
 }

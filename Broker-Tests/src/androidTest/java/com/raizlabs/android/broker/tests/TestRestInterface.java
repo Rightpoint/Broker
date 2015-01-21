@@ -42,11 +42,12 @@ public interface TestRestInterface  {
     public void fetchAllComments(JsonArrayCallback callback);
 
     @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
-    public void fetchData(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel);
+    public void fetchData(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel,
+                          RequestCallback<JSONArray> jsonArrayRequestCallback);
 
     @Method(url = POSTS + "/{userId}", method = Method.PUT)
     @ResponseHandler(SimpleJsonResponseHandler.class)
-    public void updateCommentsWithUserId(@Body String putData, @Endpoint String userId, RequestCallback<JSONObject> requestCallback);
+    public Request<JSONObject> updateCommentsWithUserId(@Body String putData, @Endpoint String userId, RequestCallback<JSONObject> requestCallback);
 
     @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
     @ResponseHandler(SimpleJsonResponseHandler.class)
