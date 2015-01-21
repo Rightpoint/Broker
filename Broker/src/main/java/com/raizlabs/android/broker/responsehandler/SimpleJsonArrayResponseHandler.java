@@ -8,7 +8,7 @@ import org.json.JSONException;
  */
 public class SimpleJsonArrayResponseHandler implements ResponseHandler<String, JSONArray> {
     @Override
-    public JSONArray processResponse(String s) {
+    public JSONArray handleResponse(String s) {
         JSONArray jsonArray = null;
         try {
             jsonArray = new JSONArray(s);

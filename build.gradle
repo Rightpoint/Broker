@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven { url 'https://raw.github.com/xujiaao/mvn-repository/master/releases' }
     }
     dependencies {
@@ -15,7 +15,7 @@ allprojects {
     group = GROUP
 
     repositories {
-        mavenCentral()
+        jcenter()
         maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
     }
 }

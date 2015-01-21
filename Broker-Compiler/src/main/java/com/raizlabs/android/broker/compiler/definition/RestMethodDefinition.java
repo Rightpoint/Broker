@@ -14,6 +14,7 @@ import com.raizlabs.android.broker.core.Header;
 import com.raizlabs.android.broker.core.Metadata;
 import com.raizlabs.android.broker.core.Method;
 import com.raizlabs.android.broker.core.Param;
+import com.raizlabs.android.broker.core.Part;
 import com.raizlabs.android.broker.core.ResponseHandler;
 import com.squareup.javawriter.JavaWriter;
 
@@ -48,7 +49,9 @@ public class RestMethodDefinition implements Definition {
 
     int methodType;
 
-    final Map<String, String> headers = Maps.newHashMap();
+    final Map<String, String> headers = Maps.newLinkedHashMap();
+
+    final Map<String, Part> partMap = Maps.newLinkedHashMap();
 
     private String[] paramCouples;
 
@@ -155,6 +158,8 @@ public class RestMethodDefinition implements Definition {
                 urlParams.put(name, param);
             } else if (variableElement.getAnnotation(Metadata.class) != null) {
                 metaDataParamName = name;
+            } else if (variableElement.getAnnotation(Part.class) != null) {
+                partMap.put(name, variableElement.getAnnotation(Part.class));
             }
         }
 
@@ -217,6 +222,7 @@ public class RestMethodDefinition implements Definition {
                         }
 
                         builder.appendUrlParams(urlParams);
+                        builder.appendParts(partMap);
                         builder.appendEmpty();
 
                         if(!returnsRequestBuilder) {

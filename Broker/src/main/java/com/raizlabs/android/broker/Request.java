@@ -1,6 +1,7 @@
 package com.raizlabs.android.broker;
 
 import com.raizlabs.android.broker.metadata.RequestMetadataGenerator;
+import com.raizlabs.android.broker.multipart.RequestEntityPart;
 import com.raizlabs.android.broker.responsehandler.ResponseHandler;
 
 import java.io.ByteArrayInputStream;
@@ -8,8 +9,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +21,7 @@ import java.util.Set;
  * This class is not final, but the methods contained are not public and all requests should be done via the
  * {@link com.raizlabs.android.broker.Request.Builder} class.
  */
-public class Request<ResponseType> implements UrlProvider{
+public class Request<ResponseType> implements UrlProvider {
 
     /**
      * The {@link com.raizlabs.android.broker.UrlProvider} that we use to retrieve the url for this request.
@@ -67,7 +69,7 @@ public class Request<ResponseType> implements UrlProvider{
      */
     private ResponseHandler<ResponseType, ?> mResponseHandler = new ResponseHandler<ResponseType, Object>() {
         @Override
-        public Object processResponse(ResponseType o) {
+        public Object handleResponse(ResponseType o) {
             return o;
         }
     };
@@ -75,15 +77,16 @@ public class Request<ResponseType> implements UrlProvider{
     /**
      * The URL-encoded params of a {@link com.raizlabs.android.broker.core.Method#GET} request
      */
-    private final Map<String, String> mParams = new LinkedHashMap<String, String>();
+    private final Map<String, String> mParams = new LinkedHashMap<>();
 
     /**
      * The headers that get put into the request.
      */
-    private final Map<String, String> mHeaders = new HashMap<String, String>();
+    private final Map<String, String> mHeaders = new LinkedHashMap<>();
+
+    private final Map<String, RequestEntityPart> mPartMap = new LinkedHashMap<>();
 
     /**
-     *
      * @param requestExecutor
      */
     Request(RequestExecutor requestExecutor) {
@@ -92,6 +95,7 @@ public class Request<ResponseType> implements UrlProvider{
 
     /**
      * Sets a url for this request using an {@link com.raizlabs.android.broker.UrlProvider}
+     *
      * @param urlProvider
      */
     void setUrlProvider(UrlProvider urlProvider) {
@@ -100,6 +104,7 @@ public class Request<ResponseType> implements UrlProvider{
 
     /**
      * Sets the listener for when the request has finished. It will return the response.
+     *
      * @param callback
      */
     void setCallback(RequestCallback callback) {
@@ -108,6 +113,7 @@ public class Request<ResponseType> implements UrlProvider{
 
     /**
      * Sets the object that will convert the response into the appropriate type in the callback.
+     *
      * @param responseHandler
      */
     void setResponseHandler(ResponseHandler<ResponseType, ?> responseHandler) {
@@ -117,14 +123,16 @@ public class Request<ResponseType> implements UrlProvider{
     /**
      * Attach meta data that you want to pass into the {@link com.raizlabs.android.broker.RequestExecutor}
      * to use such as a tag or unique id for the request.
+     *
      * @param metaData
      */
-    void setMetaData(Object metaData){
+    void setMetaData(Object metaData) {
         mMetaData = metaData;
     }
 
     /**
      * Sets the content type of the request
+     *
      * @param mContentType
      */
     void setContentType(String mContentType) {
@@ -133,6 +141,7 @@ public class Request<ResponseType> implements UrlProvider{
 
     /**
      * Sets the body of the request
+     *
      * @param mBody
      */
     void setBody(InputStream mBody, long inputStreamLength) {
@@ -142,6 +151,7 @@ public class Request<ResponseType> implements UrlProvider{
 
     /**
      * These are URL parameters. Encoding will happen at execution time.
+     *
      * @param params
      */
     void putAllParams(Map<String, String> params) {
@@ -150,11 +160,13 @@ public class Request<ResponseType> implements UrlProvider{
 
     /**
      * Add headers to the request
+     *
      * @param headers
      */
     void putAllHeaders(Map<String, String> headers) {
         headers.putAll(headers);
     }
+
 
     @Override
     public String getBaseUrl() {
@@ -163,11 +175,12 @@ public class Request<ResponseType> implements UrlProvider{
 
     /**
      * Gets the url for this request.
+     *
      * @return
      */
     @Override
     public String getUrl() {
-        if(mProvider == null) {
+        if (mProvider == null) {
             throw new RuntimeException("A Request UrlProvider must be defined before running a request");
         }
         String providerUrl = mProvider.getUrl();
@@ -179,7 +192,7 @@ public class Request<ResponseType> implements UrlProvider{
      * @return The full URL including base url, url, and encoded URL params.
      */
     public String getFullUrl() {
-        if(mFullUrl == null) {
+        if (mFullUrl == null) {
             mFullUrl = RequestUtils.formatURL(getUrl(), mParams);
         }
 
@@ -191,48 +204,91 @@ public class Request<ResponseType> implements UrlProvider{
         return mProvider.getMethod();
     }
 
+    /**
+     * @return The request executor for this request.
+     */
     public RequestExecutor getExecutor() {
         return mExecutor;
     }
 
+    /**
+     * @return The map of parameter key and values for this request.
+     */
     public Map<String, String> getParams() {
         return mParams;
     }
 
+    /**
+     * @return The map of key and values for headers for this request.
+     */
     public Map<String, String> getHeaders() {
         return mHeaders;
     }
 
+    /**
+     * @return The callback for this request.
+     */
     public RequestCallback<ResponseType> getCallback() {
         return mCallback;
     }
 
+    /**
+     * @return Handles this response and converts it into what the {@link com.raizlabs.android.broker.RequestCallback} expects.
+     */
     public ResponseHandler getResponseHandler() {
         return mResponseHandler;
     }
 
+    /**
+     * @return Data attached to this request to uniquely identify it.
+     */
     public Object getMetaData() {
         return mMetaData;
     }
 
+    /**
+     * @return The type of content for this request.
+     */
     public String getContentType() {
         return mContentType;
     }
 
+    /**
+     * @return A input into the body that this request uses.
+     */
     public InputStream getBody() {
         return mBody;
     }
 
+    /**
+     * @return The length of the body, in bytes.
+     */
     public long getBodyLength() {
         return mBodyLength;
     }
 
+    /**
+     * @return List of parts that this request contains.
+     */
+    public List<RequestEntityPart> getParts() {
+        return new LinkedList<>(mPartMap.values());
+    }
+
+    /**
+     * @return True if this request has parts defined for it.
+     */
+    public boolean isMultiPart() {
+        return !mPartMap.isEmpty();
+    }
+
+    /**
+     * Runs this request on the defined {@link com.raizlabs.android.broker.RequestExecutor}
+     */
     public void execute() {
-        if(mExecutor != null) {
+        if (mExecutor != null) {
             mExecutor.execute(this);
         }
     }
-
 
     @Override
     public String toString() {
@@ -240,17 +296,17 @@ public class Request<ResponseType> implements UrlProvider{
         retString.append("\nHeaders: ");
 
         Set<String> headers = mHeaders.keySet();
-        for(String header: headers) {
+        for (String header : headers) {
             retString.append(header).append(": ").append(mHeaders.get(header)).append("\t\n");
         }
 
-        if(mBody != null) {
+        if (mBody != null) {
             retString.append("\nBody: ").append(mBody);
         }
 
         retString.append("\nContent-Type: ").append(mContentType);
 
-        if(mMetaData != null) {
+        if (mMetaData != null) {
             retString.append("\nMetadata: ").append(mMetaData);
         }
 
@@ -262,7 +318,7 @@ public class Request<ResponseType> implements UrlProvider{
      * This enables easy request constructing and execution.
      * <br />
      * Note: The RequestCallback responseType and ResponseHandler returnType params should be the same
-     *
+     * <p/>
      * <br />
      * ResponseType is the type of the expected response. Leave this as {@link java.lang.Object}
      * if you expect different kind of responses for the same request (if that ever happens, something is direly wrong!).
@@ -271,12 +327,13 @@ public class Request<ResponseType> implements UrlProvider{
 
         protected Request<ResponseType> mRequest;
 
-        protected Builder(){
+        protected Builder() {
         }
 
         /**
          * Contructs the contained {@link com.raizlabs.android.broker.Request} with a
          * {@link com.raizlabs.android.broker.RequestExecutor} to run this request on.
+         *
          * @param requestExecutor
          */
         public Builder(RequestExecutor requestExecutor) {
@@ -285,6 +342,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Define what {@link com.raizlabs.android.broker.UrlProvider} this request uses.
+         *
          * @param urlProvider
          * @return
          */
@@ -295,6 +353,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Define how to handle the response
+         *
          * @param responseHandler
          * @return
          */
@@ -306,6 +365,7 @@ public class Request<ResponseType> implements UrlProvider{
         /**
          * Attach a unique ID to this request that the {@link com.raizlabs.android.broker.RequestExecutor}
          * can handle.
+         *
          * @param metaData
          * @return
          */
@@ -318,6 +378,7 @@ public class Request<ResponseType> implements UrlProvider{
          * Attach a unique ID to this request that the {@link com.raizlabs.android.broker.RequestExecutor}
          * can handle using a {@link com.raizlabs.android.broker.metadata.RequestMetadataGenerator}.
          * Call this right before execute, so that the parameters of the contained request are all available.
+         *
          * @param generator
          * @return
          */
@@ -328,6 +389,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Sets the contentType header of this request
+         *
          * @param contentType
          * @return
          */
@@ -338,6 +400,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Optional data passed into the request as byte code.
+         *
          * @param body
          * @return
          */
@@ -349,6 +412,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Optional data passed into the request as byte code.
+         *
          * @param body
          * @return
          */
@@ -359,6 +423,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Optional data passed into the request as byte code.
+         *
          * @param body
          * @return
          */
@@ -373,6 +438,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Adds a URL param to the request.
+         *
          * @param key
          * @param value
          * @return
@@ -384,6 +450,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Adds a {@link java.util.Map} of key value pairs to be URL formatted.
+         *
          * @param map
          * @return
          */
@@ -394,6 +461,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Adds a header to this request.
+         *
          * @param key
          * @param value
          * @return
@@ -405,6 +473,7 @@ public class Request<ResponseType> implements UrlProvider{
 
         /**
          * Adds a {@link java.util.Map} of headers to this request.
+         *
          * @param map
          * @return
          */
@@ -414,7 +483,41 @@ public class Request<ResponseType> implements UrlProvider{
         }
 
         /**
+         * Adds a part for a corresponding multipart request, does not set the part as a file.
+         *
+         * @param name  The name of the part
+         * @param value The value of the part.
+         * @return
+         */
+        public Builder<ResponseType> addPart(String name, String value) {
+            return addPart(new RequestEntityPart(name, value, false));
+        }
+
+        /**
+         * Adds a file part for a corresponding multipart.
+         *
+         * @param name       The name of the part
+         * @param pathToFile The path to the file
+         * @return
+         */
+        public Builder<ResponseType> addFilePart(String name, String pathToFile) {
+            return addPart(new RequestEntityPart(name, pathToFile, true));
+        }
+
+        /**
+         * Adds a {@link com.raizlabs.android.broker.multipart.RequestEntityPart} to this request.
+         *
+         * @param part The part to add.
+         * @return
+         */
+        public Builder<ResponseType> addPart(RequestEntityPart part) {
+            mRequest.mPartMap.put(part.getName(), part);
+            return this;
+        }
+
+        /**
          * Executes this request, returning on the {@link RequestCallback},
+         *
          * @param requestCallback
          * @return
          */

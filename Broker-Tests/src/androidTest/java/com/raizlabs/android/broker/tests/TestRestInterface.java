@@ -7,6 +7,7 @@ import com.raizlabs.android.broker.core.Body;
 import com.raizlabs.android.broker.core.Endpoint;
 import com.raizlabs.android.broker.core.Method;
 import com.raizlabs.android.broker.core.Param;
+import com.raizlabs.android.broker.core.Part;
 import com.raizlabs.android.broker.core.RequestExecutor;
 import com.raizlabs.android.broker.core.ResponseHandler;
 import com.raizlabs.android.broker.core.RestService;
@@ -18,8 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * Author: andrewgrosner
- * Contributors: { }
  * Description:
  */
 @RestService(baseUrl = "http://jsonplaceholder.typicode.com")
@@ -59,4 +58,8 @@ public interface TestRestInterface  {
 
     @Method(url = COMMENTS)
     public Request<JSONArray> getPostsByUserIdParamRequest(@Param("userId") long userId, @Param("id") long id);
+
+    @Method(url = COMMENTS)
+    public void postCommentData(@Part(name = "image", isFile = true) String imageFilePath, @Part(name = "caption") String caption);
+
 }

@@ -37,7 +37,7 @@ public class BrokerWebServiceRequest<ResultType> extends BaseWebServiceRequest<R
     @SuppressWarnings("unchecked")
     @Override
     protected ResultType translate(Response response) {
-        return (ResultType) mRequest.getResponseHandler().processResponse(response.getContentAsString());
+        return (ResultType) mRequest.getResponseHandler().handleResponse(response.getContentAsString());
     }
 
     public void execute(final WebServiceManagerExecutor executor) {

@@ -8,7 +8,7 @@ import org.json.JSONObject;
  */
 public class SimpleJsonResponseHandler implements ResponseHandler<String, JSONObject> {
     @Override
-    public JSONObject processResponse(String s) {
+    public JSONObject handleResponse(String s) {
         JSONObject jsonObject = null;
         try {
             jsonObject = new JSONObject(s);

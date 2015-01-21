@@ -44,7 +44,6 @@ public class TestRestTest extends AndroidTestCase {
 
         BaseRestInterface baseRestInterface = ((BaseRestInterface) restInterface);
         WebServiceManagerExecutor managerExecutor = ((WebServiceManagerExecutor) baseRestInterface.getRequestExecutor());
-        WebServiceManager webServiceManager = managerExecutor.getWebServiceManager();
 
         // Wait for requests, no timeout specified so if requests fail to remove, we will find it here.
         while (managerExecutor.getActiveRequestSize() != 0) {

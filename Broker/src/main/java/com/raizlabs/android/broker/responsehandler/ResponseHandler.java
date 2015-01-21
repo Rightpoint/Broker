@@ -12,5 +12,5 @@ public interface ResponseHandler<ResponseType, ReturnType> {
      * @param responseType
      * @return
      */
-    public ReturnType processResponse(ResponseType responseType);
+    public ReturnType handleResponse(ResponseType responseType);
 }

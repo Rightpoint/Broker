@@ -18,7 +18,7 @@ public class MockRequestExecutor implements RequestExecutor<String> {
             if(mockRequest.hasError()) {
                 callback.onRequestError(null, String.valueOf(dummyResponse));
             } else {
-                callback.onRequestDone(mockRequest.getResponseHandler().processResponse(mockRequest.getDummyResponse()));
+                callback.onRequestDone(mockRequest.getResponseHandler().handleResponse(mockRequest.getDummyResponse()));
             }
         }
     }

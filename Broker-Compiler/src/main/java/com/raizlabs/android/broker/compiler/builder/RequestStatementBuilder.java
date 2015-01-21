@@ -2,6 +2,7 @@ package com.raizlabs.android.broker.compiler.builder;
 
 import com.raizlabs.android.broker.compiler.Classes;
 import com.raizlabs.android.broker.core.Param;
+import com.raizlabs.android.broker.core.Part;
 
 import java.util.Map;
 import java.util.Set;
@@ -96,6 +97,19 @@ public class RequestStatementBuilder  {
 
     public RequestStatementBuilder appendExecute() {
         append("request.execute()");
+        return this;
+    }
+
+    public RequestStatementBuilder appendParts(Map<String, Part> partMap) {
+        if(partMap != null && !partMap.isEmpty()) {
+            Set<String> variables = partMap.keySet();
+            for(String variableName: variables) {
+                Part part = partMap.get(variableName);
+                appendEmpty();
+                mBuilder.append(String.format(".add%sPart(\"%1s\",%1s)", part.isFile() ? "File" : "",
+                        part.name(), variableName));
+            }
+        }
         return this;
     }
 }

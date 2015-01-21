@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Author: andrewgrosner
  * Description: Marks a parameter as a URL parameter in a {@link com.raizlabs.android.broker.core.RestService}
  * method. By default each parameter is URL encoded. Call {@link #encode()} to false to use the {@link java.lang.String#valueOf(Object)}
  * instead for the parameter.

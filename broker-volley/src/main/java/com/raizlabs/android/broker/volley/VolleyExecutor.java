@@ -77,7 +77,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
             public void onResponse(String s) {
                 RequestCallback requestCallback = request.getCallback();
                 if(requestCallback != null) {
-                    requestCallback.onRequestDone(request.getResponseHandler().processResponse(s));
+                    requestCallback.onRequestDone(request.getResponseHandler().handleResponse(s));
                 }
             }
         };

@@ -1,15 +1,21 @@
 package com.raizlabs.android.broker.volley;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Response;
+import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.raizlabs.android.broker.Request;
+import com.raizlabs.android.broker.multipart.RequestEntityPart;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +29,11 @@ public class BrokerVolleyRequest extends StringRequest {
     private Request mRequest;
 
     /**
+     * Used if this request contains multipart, we will write out the parts.
+     */
+    private HttpEntity mMultiPartEntity;
+
+    /**
      * Constructs a new volley request with our {@link com.raizlabs.android.broker.Request} object
      *
      * @param request       - the {@link com.raizlabs.android.broker.Request}
@@ -33,6 +44,19 @@ public class BrokerVolleyRequest extends StringRequest {
     public BrokerVolleyRequest(Request request, String url, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         super(request.getMethod(), url, listener, errorListener);
         mRequest = request;
+
+        if (mRequest.isMultiPart()) {
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            List<RequestEntityPart> entityPartList = request.getParts();
+            for (RequestEntityPart part : entityPartList) {
+                if (part.isFile()) {
+                    builder.addBinaryBody(part.getName(), new File(part.getValue()));
+                } else {
+                    builder.addTextBody(part.getName(), part.getValue());
+                }
+            }
+            mMultiPartEntity = builder.build();
+        }
     }
 
     @Override
@@ -52,8 +76,10 @@ public class BrokerVolleyRequest extends StringRequest {
 
     @Override
     public String getBodyContentType() {
-        String contentType = null;
-        if (mRequest.getContentType() != null) {
+        String contentType;
+        if (mMultiPartEntity != null) {
+            contentType = mMultiPartEntity.getContentType().getValue();
+        } else if (mRequest.getContentType() != null) {
             contentType = mRequest.getContentType();
         } else {
             contentType = super.getBodyContentType();
@@ -69,19 +95,27 @@ public class BrokerVolleyRequest extends StringRequest {
             body = super.getBody();
         } else {
 
-            InputStream requestInputStream = mRequest.getBody();
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-
-            int nRead;
-            byte[] data = new byte[(int) mRequest.getBodyLength()];
-
-            try {
-                while ((nRead = requestInputStream.read(data, 0, data.length)) != -1) {
-                    buffer.write(data, 0, nRead);
+            if (mMultiPartEntity != null) {
+                try {
+                    mMultiPartEntity.writeTo(buffer);
+                } catch (IOException e) {
+                    VolleyLog.e(e, "Error when writing MultiPart entity");
                 }
-                buffer.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+
+                InputStream requestInputStream = mRequest.getBody();
+                int nRead;
+                byte[] data = new byte[(int) mRequest.getBodyLength()];
+
+                try {
+                    while ((nRead = requestInputStream.read(data, 0, data.length)) != -1) {
+                        buffer.write(data, 0, nRead);
+                    }
+                    buffer.flush();
+                } catch (IOException e) {
+                    VolleyLog.e(e, "Error when writing request body");
+                }
             }
 
             body = buffer.toByteArray();
