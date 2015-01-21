@@ -4,6 +4,7 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.raizlabs.android.broker.Request;
+import com.raizlabs.android.broker.RequestCallbackAdapter;
 import com.raizlabs.android.broker.RequestConfig;
 import com.raizlabs.android.broker.RequestManager;
 import com.raizlabs.android.broker.core.Method;

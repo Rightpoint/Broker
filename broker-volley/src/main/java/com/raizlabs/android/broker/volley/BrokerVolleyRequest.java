@@ -26,7 +26,6 @@ public class BrokerVolleyRequest extends StringRequest {
      * Constructs a new volley request with our {@link com.raizlabs.android.broker.Request} object
      *
      * @param request       - the {@link com.raizlabs.android.broker.Request}
-     * @param method        - the volley Method int
      * @param url           - URL formatted url from Request
      * @param listener      - the listener for a response
      * @param errorListener - the listener for an error
@@ -35,7 +34,6 @@ public class BrokerVolleyRequest extends StringRequest {
         super(request.getMethod(), url, listener, errorListener);
         mRequest = request;
     }
-
 
     @Override
     @SuppressWarnings("unchecked")

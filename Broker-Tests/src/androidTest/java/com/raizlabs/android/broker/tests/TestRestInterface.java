@@ -2,6 +2,7 @@ package com.raizlabs.android.broker.tests;
 
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
+import com.raizlabs.android.broker.RequestCallbackAdapter;
 import com.raizlabs.android.broker.core.Body;
 import com.raizlabs.android.broker.core.Endpoint;
 import com.raizlabs.android.broker.core.Method;
@@ -47,7 +48,7 @@ public interface TestRestInterface  {
 
     @Method(url = POSTS + "/{userId}", method = Method.PUT)
     @ResponseHandler(SimpleJsonResponseHandler.class)
-    public Request<JSONObject> updateCommentsWithUserId(@Body String putData, @Endpoint String userId, RequestCallback<JSONObject> requestCallback);
+    public Request<JSONObject> updateCommentsWithUserId(@Body String putData, @Endpoint String userId, RequestCallbackAdapter<JSONObject> requestCallback);
 
     @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
     @ResponseHandler(SimpleJsonResponseHandler.class)
