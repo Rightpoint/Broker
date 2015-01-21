@@ -282,6 +282,13 @@ public class Request<ResponseType> implements UrlProvider {
     }
 
     /**
+     * @return True if the length of the body is larger than 0 and an input stream for the body is defined.
+     */
+    public boolean hasBody() {
+        return mBodyLength > 0 && mBody != null;
+    }
+
+    /**
      * Runs this request on the defined {@link com.raizlabs.android.broker.RequestExecutor}
      */
     public void execute() {

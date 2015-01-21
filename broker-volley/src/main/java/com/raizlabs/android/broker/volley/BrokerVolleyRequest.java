@@ -5,17 +5,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.raizlabs.android.broker.Request;
-import com.raizlabs.android.broker.multipart.RequestEntityPart;
+import com.raizlabs.android.broker.RequestUtils;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,16 +43,7 @@ public class BrokerVolleyRequest extends StringRequest {
         mRequest = request;
 
         if (mRequest.isMultiPart()) {
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            List<RequestEntityPart> entityPartList = request.getParts();
-            for (RequestEntityPart part : entityPartList) {
-                if (part.isFile()) {
-                    builder.addBinaryBody(part.getName(), new File(part.getValue()));
-                } else {
-                    builder.addTextBody(part.getName(), part.getValue());
-                }
-            }
-            mMultiPartEntity = builder.build();
+            mMultiPartEntity = RequestUtils.createMultipartEntity(request);
         }
     }
 

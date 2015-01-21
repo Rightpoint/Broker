@@ -2,12 +2,18 @@ package com.raizlabs.android.broker.webservicemanager;
 
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
+import com.raizlabs.android.broker.RequestUtils;
+import com.raizlabs.logging.Logger;
 import com.raizlabs.net.requests.BaseWebServiceRequest;
 import com.raizlabs.net.requests.RequestBuilder;
 import com.raizlabs.net.responses.Response;
 import com.raizlabs.net.webservicemanager.ResultInfo;
 import com.raizlabs.net.webservicemanager.WebServiceManager;
 import com.raizlabs.net.webservicemanager.WebServiceRequestListener;
+
+import org.apache.http.HttpEntity;
+
+import java.io.IOException;
 
 /**
  * Description: A simple wrapper that is the mediator between a {@link com.raizlabs.net.requests.BaseWebServiceRequest}
@@ -22,6 +28,17 @@ public class BrokerWebServiceRequest<ResultType> extends BaseWebServiceRequest<R
     public BrokerWebServiceRequest(Request<ResultType> request) {
         mBuilder = new RequestBuilder(WebServiceManagerUtils.convertMethodIntToMethod(request.getMethod()),
                 request.getFullUrl());
+
+        if (request.hasBody()) {
+            mBuilder.setInputStream(request.getBody(), request.getBodyLength(), null);
+        } else if (request.isMultiPart()) {
+            HttpEntity multipartEntity = RequestUtils.createMultipartEntity(request);
+            try {
+                mBuilder.setInputStream(multipartEntity.getContent(), multipartEntity.getContentLength(), null);
+            } catch (IOException e) {
+                Logger.e(getClass().getSimpleName(), "Error getting content for the multipart request");
+            }
+        }
         mRequest = request;
     }
 
