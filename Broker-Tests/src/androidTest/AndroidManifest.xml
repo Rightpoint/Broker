@@ -4,7 +4,7 @@
           package="com.raizlabs.android.broker.tests">
 
     <uses-sdk android:minSdkVersion="8"
-              tools:overrideLibrary="com.raizlabs.baseutils"
+              tools:overrideLibrary="com.raizlabs.baseutils, com.raizlabs.net.webservicemanager"
         />
     <application/>
 

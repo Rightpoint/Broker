@@ -54,4 +54,7 @@ public interface TestRestInterface  {
 
     @Method(url = COMMENTS)
     public Request.Builder<JSONObject> getCommentsRequestBuilder();
+
+    @Method(url = COMMENTS)
+    public Request<JSONArray> getPostsByUserIdParamRequest(@Param("userId") long userId, @Param("id") long id);
 }

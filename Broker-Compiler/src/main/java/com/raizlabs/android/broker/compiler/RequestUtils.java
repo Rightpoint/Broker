@@ -109,4 +109,21 @@ public class RequestUtils {
         }
         return impl;
     }
+
+    /**
+     * @param types             The typeutils to use
+     * @param superDeclaredType The type of the super class with its wildcard params
+     * @param compare           The element to check
+     * @return The interface defined by the superDeclaredType
+     */
+    public static TypeMirror getInterfaceClass(Types types, DeclaredType superDeclaredType, TypeElement compare) {
+        TypeMirror mirror = null;
+        for (TypeMirror superType : compare.getInterfaces()) {
+            if (types.isAssignable(superType, superDeclaredType)) {
+                mirror = superType;
+                break;
+            }
+        }
+        return mirror;
+    }
 }

@@ -18,6 +18,8 @@ import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * Author: andrewgrosner
@@ -47,14 +49,14 @@ public class RestServiceDefinition extends BaseDefinition {
         baseUrlResId = restService.baseUrlResId();
 
         ResponseHandler responseHandler = typeElement.getAnnotation(ResponseHandler.class);
-        if(responseHandler != null) {
+        if (responseHandler != null) {
             responseHandlerClass = RequestUtils.getResponseHandler(responseHandler);
         } else {
             responseHandlerClass = ResponseHandler.class.getCanonicalName();
         }
 
         RequestExecutor requestExecutor = typeElement.getAnnotation(RequestExecutor.class);
-        if(requestExecutor != null) {
+        if (requestExecutor != null) {
             requestExecutorClass = RequestUtils.getRequestExecutor(requestExecutor);
         } else {
             requestExecutorClass = RequestExecutor.class.getCanonicalName();
@@ -65,6 +67,26 @@ public class RestServiceDefinition extends BaseDefinition {
         for (Element element : elements) {
             if (element.getAnnotation(Method.class) != null) {
                 restMethodDefinitions.add(new RestMethodDefinition(requestManager, element));
+            }
+        }
+
+
+        List<? extends TypeMirror> interfaces = requestManager.getElements().getTypeElement(getFQCN()).getInterfaces();
+        if(!interfaces.isEmpty()) {
+            TypeMirror superclass = interfaces.get(0);
+            while (superclass != null) {
+                TypeElement superElement = ((TypeElement) requestManager.getTypeUtils().asElement(superclass));
+                if (superElement != null) {
+                    List<? extends Element> superElements = superElement.getEnclosedElements();
+                    for (Element element : superElements) {
+                        if (element.getAnnotation(Method.class) != null) {
+                            restMethodDefinitions.add(new RestMethodDefinition(requestManager, element));
+                        }
+                    }
+                    superclass = superElement.getSuperclass();
+                } else {
+                    superclass = null;
+                }
             }
         }
     }

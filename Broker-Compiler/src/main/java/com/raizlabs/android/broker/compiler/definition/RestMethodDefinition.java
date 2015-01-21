@@ -123,7 +123,7 @@ public class RestMethodDefinition implements Definition {
 
         Map<String, String> endpoints = Maps.newHashMap();
 
-        urlParams = Maps.newHashMap();
+        urlParams = Maps.newLinkedHashMap();
 
         for (int i = 0; i < paramCouples.length; i += 2) {
             VariableElement variableElement = params.get(i / 2);
