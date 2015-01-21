@@ -1,4 +1,4 @@
-package com.raizlabs.android.broker.test;
+package com.raizlabs.android.broker.tests;
 
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
@@ -26,9 +26,9 @@ import org.json.JSONObject;
 @RequestExecutor(VolleyExecutor.class)
 public interface TestRestInterface  {
 
-    public static final String POSTS = "/posts";
+    public static final String POSTS = "posts";
 
-    public static final String COMMENTS = "/comments";
+    public static final String COMMENTS = "comments";
 
 
     @Method(url = POSTS)

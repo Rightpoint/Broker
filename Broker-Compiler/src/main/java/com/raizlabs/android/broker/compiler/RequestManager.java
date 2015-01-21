@@ -22,9 +22,8 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 /**
- * Author: andrewgrosner
- * Contributors: { }
- * Description: Holds all of the RequestService information
+ * Description: Holds all of the compiler information and provides some handy methods to assist in
+ * the processing.
  */
 public class RequestManager implements Definition{
 

@@ -1,4 +1,4 @@
-package com.raizlabs.android.broker.test;
+package com.raizlabs.android.broker.tests;
 
 import com.raizlabs.android.broker.MockRequest;
 import com.raizlabs.android.broker.Request;

@@ -100,6 +100,11 @@ public class RestMethodDefinition implements Definition {
 
         url = method.url();
 
+        // add leading slash if missing
+        if(url != null && url.length() > 0 && !url.startsWith("/")) {
+            url = "/" + url;
+        }
+
         methodType = method.method();
 
         Header[] headers = method.headers();
