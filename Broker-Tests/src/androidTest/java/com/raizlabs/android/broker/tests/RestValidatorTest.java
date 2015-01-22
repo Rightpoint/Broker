@@ -25,7 +25,7 @@ public class RestValidatorTest extends AndroidTestCase {
 
         // Testing albums request
 
-        Request<JSONArray> request = restInterface.getAllAlbumsRequest(null);
+        Request<JSONArray> request = restInterface.getAllAlbumsRequest("3", null);
 
         assertEquals(request.getResponseHandler(), RequestConfig.getSharedResponseHandler());
 
@@ -43,9 +43,13 @@ public class RestValidatorTest extends AndroidTestCase {
         assertNotNull(param);
         assertEquals("myNumber", param);
 
+        param = params.get("albumId");
+        assertNotNull(param);
+        assertEquals("3", param);
+
         // Testing headers request
 
-        request = restInterface.getAllCommentsRequest(null);
+        request = restInterface.getAllCommentsRequest("3", null);
 
         assertEquals(request.getResponseHandler(), RequestConfig.getSharedResponseHandler());
 
@@ -61,17 +65,19 @@ public class RestValidatorTest extends AndroidTestCase {
         assertTrue(!headers.isEmpty());
         String header = headers.get("userId");
         assertNotNull(header);
-        assertEquals("myNumber", param);
+        assertEquals("myNumber", header);
+
+        header = headers.get("albumId");
+        assertNotNull(header);
+        assertEquals("3", header);
 
         // Testing part request
 
-        request = restInterface.getExamplePartRequest("test", "test2");
+        request = restInterface.getExamplePartRequest("3", "test", "test2");
 
         assertTrue(request.getResponseHandler() instanceof SimpleJsonArrayResponseHandler);
 
-        assertTrue(request.getExecutor() instanceof VolleyExecutor);
-
-        assertEquals(TestRestInterface2.BASE_URL + "/test/test2", request.getUrl());
+        assertEquals(TestRestInterface2.BASE_URL + "/test/test2/", request.getUrl());
 
         assertEquals(TestRestInterface2.BASE_URL, request.getBaseUrl());
 
@@ -81,13 +87,18 @@ public class RestValidatorTest extends AndroidTestCase {
         assertTrue(!headers.isEmpty());
         String tempHeader = headers.get("User-Agent");
         assertNotNull(tempHeader);
-        assertEquals("Android", param);
+        assertEquals("Android", tempHeader);
 
         List<RequestEntityPart> parts = request.getParts();
-        assertTrue(parts.size() == 1);
+        assertTrue(parts.size() == 2);
         RequestEntityPart part = parts.get(0);
         assertEquals("isOpen", part.getName());
         assertEquals("true", part.getValue());
         assertFalse(part.isFile());
+
+        part = parts.get(1);
+        assertEquals("albumId", part.getName());
+        assertEquals("3", part.getValue());
+        assertTrue(part.isFile());
     }
 }

@@ -29,16 +29,23 @@ public interface TestRestInterface2 {
     @Method(url = ALBUMS,
             priority = Priority.HIGH,
             params = {@Param(name = "userId", value = "myNumber")})
-    public Request<JSONArray> getAllAlbumsRequest(RequestCallback<JSONArray> callback);
+    public Request<JSONArray> getAllAlbumsRequest(
+            @Param("albumId") String albumId,
+            RequestCallback<JSONArray> callback);
 
     @Method(url = COMMENTS,
             priority = Priority.IMMEDIATE,
             headers = {@Header(name = "userId", value = "myNumber")})
-    public Request<JSONArray> getAllCommentsRequest(RequestCallback<JSONArray> callback);
+    public Request<JSONArray> getAllCommentsRequest(
+            @Header("albumId") String albumId,
+            RequestCallback<JSONArray> callback);
 
     @Method(url = "/{endpoint1}/{endpoint2}/",
             headers = {@Header(name = "User-Agent", value = "Android")},
             parts = {@Part(name = "isOpen", value = "true")})
     @ResponseHandler(SimpleJsonArrayResponseHandler.class)
-    public Request<JSONArray> getExamplePartRequest(@Endpoint String endpoint1, @Endpoint String endpoint2);
+    public Request<JSONArray> getExamplePartRequest(@Part(value = "albumId",
+                                                    isFile = true) String albumId,
+                                                    @Endpoint String endpoint1,
+                                                    @Endpoint String endpoint2);
 }
