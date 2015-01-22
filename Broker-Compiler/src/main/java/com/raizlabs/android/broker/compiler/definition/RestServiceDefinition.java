@@ -18,7 +18,6 @@ import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 /**
@@ -72,7 +71,7 @@ public class RestServiceDefinition extends BaseDefinition {
 
 
         List<? extends TypeMirror> interfaces = requestManager.getElements().getTypeElement(getFQCN()).getInterfaces();
-        if(!interfaces.isEmpty()) {
+        if (!interfaces.isEmpty()) {
             TypeMirror superclass = interfaces.get(0);
             while (superclass != null) {
                 TypeElement superElement = ((TypeElement) requestManager.getTypeUtils().asElement(superclass));
@@ -125,7 +124,11 @@ public class RestServiceDefinition extends BaseDefinition {
                 Sets.newHashSet(Modifier.PUBLIC, Modifier.FINAL), new Definition() {
                     @Override
                     public void write(JavaWriter javaWriter) throws IOException {
-                        javaWriter.emitStatement("return new %1s()", responseHandlerClass);
+                        if (responseHandlerClass.equals(ResponseHandler.class.getCanonicalName())) {
+                            javaWriter.emitStatement("return %1s.getSharedResponseHandler()", Classes.REQUEST_CONFIG);
+                        } else {
+                            javaWriter.emitStatement("return new %1s()", responseHandlerClass);
+                        }
                     }
                 });
 
@@ -133,7 +136,11 @@ public class RestServiceDefinition extends BaseDefinition {
                 Sets.newHashSet(Modifier.PUBLIC, Modifier.FINAL), new Definition() {
                     @Override
                     public void write(JavaWriter javaWriter) throws IOException {
-                        javaWriter.emitStatement("return new %1s()", requestExecutorClass);
+                        if (requestExecutorClass.equals(RequestExecutor.class.getCanonicalName())) {
+                            javaWriter.emitStatement("return %1s.getSharedExecutor()", Classes.REQUEST_CONFIG);
+                        } else {
+                            javaWriter.emitStatement("return new %1s()", requestExecutorClass);
+                        }
                     }
                 });
 

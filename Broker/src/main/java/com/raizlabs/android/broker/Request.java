@@ -598,6 +598,17 @@ public class Request<ResponseType> implements UrlProvider {
         }
 
         /**
+         * Adds a map of parts to the request.
+         *
+         * @param partMap The map of parts to use
+         * @return
+         */
+        public Builder<ResponseType> addPartMap(Map<String, RequestEntityPart> partMap) {
+            mRequest.mPartMap.putAll(partMap);
+            return this;
+        }
+
+        /**
          * Executes this request, returning on the {@link RequestCallback},
          *
          * @param requestCallback

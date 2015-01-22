@@ -30,7 +30,6 @@ public interface TestRestInterface  {
 
     public static final String COMMENTS = "comments";
 
-
     @Method(url = POSTS)
     public void fetchPostsByUserId(@Param("userId") long userID,
                                    RequestCallback<JSONArray> requestCallback);
