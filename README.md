@@ -1,4 +1,4 @@
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Broker-red.svg?style=flat)](https://android-arsenal.com/details/1/1256) [![Raizlabs Repository](http://img.shields.io/badge/Raizlabs%20Repository-1.0.0-blue.svg?style=flat)](https://github.com/Raizlabs/maven-releases)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Broker-red.svg?style=flat)](https://android-arsenal.com/details/1/1256) [![Raizlabs Repository](http://img.shields.io/badge/Raizlabs%20Repository-1.1.0-blue.svg?style=flat)](https://github.com/Raizlabs/maven-releases)
 
 # Broker
 
@@ -27,15 +27,37 @@ Add this line to your build.gradle, using the [apt plugin](https://bitbucket.org
 ```groovy
 
 dependencies {
-  apt 'com.raizlabs.android:Broker-Compiler:1.0.0'
-  aarLinkSources 'com.raizlabs.android:Broker-Compiler:1.0.0:sources@jar'
-  compile 'com.raizlabs.android:Broker-Core:1.0.0'
-  aarLinkSources 'com.raizlabs.android:Broker-Core:1.0.0:sources@jar'
-  compile 'com.raizlabs.android:Broker: 1.0.0'
-  aarLinkSources 'com.raizlabs.android:Broker:1.0.0:sources@jar'
+  apt 'com.raizlabs.android:Broker-Compiler:1.1.0'
+  aarLinkSources 'com.raizlabs.android:Broker-Compiler:1.1.0:sources@jar'
+  compile 'com.raizlabs.android:Broker-Core:1.1.0'
+  aarLinkSources 'com.raizlabs.android:Broker-Core:1.1.0:sources@jar'
+  compile 'com.raizlabs.android:Broker: 1.1.0'
+  aarLinkSources 'com.raizlabs.android:Broker:1.1.0:sources@jar'
 
 }
 
+
+```
+
+#### Volley Support
+
+To use the provided ```VolleyExecutor```, add these lines:
+
+```java
+
+      compile 'com.raizlabs.android:Broker-Volley:1.1.0'
+      aarLinkSources 'com.raizlabs.android:Broker-Volley:1.1.0:sources@jar'
+
+```
+
+#### WebServiceManager
+
+To use ```WebServiceManager``` ([repo](https://github.com/Raizlabs/RZAndroidWebServiceManager)), add these lines:
+
+```java
+
+      compile 'com.raizlabs.android:Broker-WebServiceManager:1.1.0'
+      aarLinkSources 'com.raizlabs.android:Broker-WebServiceManager:1.1.0:sources@jar'
 
 ```
 
