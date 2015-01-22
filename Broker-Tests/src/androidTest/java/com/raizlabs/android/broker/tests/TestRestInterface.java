@@ -59,6 +59,6 @@ public interface TestRestInterface  {
     public Request<JSONArray> getPostsByUserIdParamRequest(@Param("userId") long userId, @Param("id") long id);
 
     @Method(url = COMMENTS)
-    public void postCommentData(@Part(name = "image", isFile = true) String imageFilePath, @Part(name = "caption") String caption);
+    public void postCommentData(@Part(value = "image", isFile = true) String imageFilePath, @Part("caption") String caption);
 
 }

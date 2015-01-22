@@ -82,13 +82,26 @@ public class RequestStatementBuilder  {
                 Param param = urlParams.get(key);
 
                 appendEmpty();
-                mBuilder.append(String.format(".addUrlParam(\"%1s\", ", param.value()));
+
+                boolean isHeaderParam = false;
+                String keyName = param.value();
+                if(param.name() != null && !param.name().isEmpty()) {
+                    keyName = param.name();
+                    isHeaderParam = true;
+                }
+
+                mBuilder.append(String.format(".addUrlParam(\"%1s\", ", keyName));
+
+                String variableName = key;
+                if(isHeaderParam) {
+                    variableName = "\"" + param.value() + "\"";
+                }
 
                 if(param.encode()) {
                     mBuilder.append(String.format("%1s.tryEncode(%1s))",
-                            Classes.REQUEST_UTILS, key));
+                            Classes.REQUEST_UTILS, variableName));
                 } else {
-                    mBuilder.append(String.format("String.valueOf(%1s))", key));
+                    mBuilder.append(String.format("String.valueOf(%1s))", variableName));
                 }
             }
         }
@@ -107,8 +120,20 @@ public class RequestStatementBuilder  {
             for(String variableName: variables) {
                 Part part = partMap.get(variableName);
                 appendEmpty();
+                String partKey = part.value();
+                boolean isHeaderPart = false;
+                if(part.name() != null && !part.name().isEmpty()) {
+                    partKey = part.name();
+                    isHeaderPart = true;
+                }
+
+                String partValue = variableName;
+                if(isHeaderPart) {
+                    partValue = "\"" + part.value() + "\"";
+                }
+
                 mBuilder.append(String.format(".add%sPart(\"%1s\",%1s)", part.isFile() ? "File" : "",
-                        part.name(), variableName));
+                        partKey, partValue));
             }
         }
         return this;

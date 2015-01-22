@@ -65,7 +65,7 @@ public class RestMethodDefinition implements Definition {
 
     String responseHandler;
 
-    Map<String, Param> urlParams;
+    Map<String, Param> urlParams = Maps.newLinkedHashMap();
 
     VariableElement callbackParam;
 
@@ -119,6 +119,17 @@ public class RestMethodDefinition implements Definition {
             this.headers.put(header.name(), "\"" + header.value() + "\"");
         }
 
+        Param[] paramArray = method.params();
+        for(Param param: paramArray) {
+            this.urlParams.put(param.name(), param);
+        }
+
+        Part[] parts = method.parts();
+        for(Part part: parts) {
+            this.partMap.put(part.value(), part);
+        }
+
+
         if(inElement.getAnnotation(ResponseHandler.class) != null) {
             responseHandler = RequestUtils.getResponseHandler(inElement.getAnnotation(ResponseHandler.class));
         }
@@ -129,8 +140,6 @@ public class RestMethodDefinition implements Definition {
         List<String> replaceParams = RestParameterMatcher.getMatches(url);
 
         Map<String, String> endpoints = Maps.newHashMap();
-
-        urlParams = Maps.newLinkedHashMap();
 
         for (int i = 0; i < paramCouples.length; i += 2) {
             VariableElement variableElement = params.get(i / 2);

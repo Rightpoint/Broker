@@ -14,9 +14,15 @@ import java.lang.annotation.Target;
 public @interface Part {
 
     /**
-     * @return the name of the part of multipart request
+     * @return the name of the part of multipart request. Only used when part of a {@link com.raizlabs.android.broker.core.Method}
      */
-    String name();
+    String name() default "";
+
+    /**
+     * @return value of the part when used in a {@link com.raizlabs.android.broker.core.Method}. If used alone,
+     * it is the key of the Part.
+     */
+    String value();
 
     /**
      * @return true if this part is a file path
