@@ -109,11 +109,6 @@ public class RequestStatementBuilder  {
         return this;
     }
 
-    public RequestStatementBuilder appendExecute() {
-        append("request.execute()");
-        return this;
-    }
-
     public RequestStatementBuilder appendParts(Map<String, Part> partMap) {
         if(partMap != null && !partMap.isEmpty()) {
             Set<String> variables = partMap.keySet();
