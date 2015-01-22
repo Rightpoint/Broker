@@ -164,7 +164,7 @@ public interface SimpleRestService {
 
 Next we define each ```@Method``` we want to generate from this interface. 
 
-```@Method```: Defines a url (that's appended to the end of the base url), what HTTP method to use (use ```@Method``` constants), and static HTTP headers. 
+```@Method```: Defines a url (that's appended to the end of the base url), what HTTP method to use (use ```@Method``` constants), and static HTTP headers. If we place any string within it enclosed by "{}" it becomes an ```@Endpoint``` variable with the same name. 
 
 Within the function parameters, we must use annotations to specify what parameter goes where:
 
@@ -184,23 +184,41 @@ Within the function parameters, we must use annotations to specify what paramete
 
 ```java
 
-    @Method(url = "/users/{userName}/{password}",
-            headers = {@Header(name = "MAC", value = "OS")})
-    public void getUsers(@Endpoint String password, @Endpoint String userName, @Header("User-Agent") String userAgent, RequestCallback<JSONObject> requestCallback);
+    public static final String POSTS = "posts";
 
-    @Method(url = "/users/{firstName}", method = Method.PUT)
-    public void putFirstName(@Endpoint String firstName, @Body String requestBody, RequestCallback<JSONObject> requestCallback);
+    public static final String COMMENTS = "comments";
 
-    @Method(url = "/hello/{goodBye}", method = Method.DELETE)
-    public void deleteGoodbye(@Param("myNameIs") String what,
-                              @Param("jasonSays") String yeah,
-                              @Endpoint String goodBye,
-                              @Metadata double flack,
-                              RequestCallback<JSONObject> requestCallback);
 
-    @Method(url = "/hello/yep")
-    @ResponseHandler(SimpleJsonArrayResponseHandler.class)
-    public void getYep(RequestCallback<JSONArray> requestCallback);
+    @Method(url = POSTS)
+    public void fetchPostsByUserId(@Param("userId") long userID,
+                                   RequestCallback<JSONArray> requestCallback);
+
+    @Method(url = POSTS)
+    public void fetchAllPosts(JsonArrayCallback requestCallback);
+
+    @Method(url = COMMENTS)
+    public void fetchAllComments(JsonArrayCallback callback);
+
+    @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
+    public void fetchData(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel,
+                          RequestCallback<JSONArray> jsonArrayRequestCallback);
+
+    @Method(url = POSTS + "/{userId}", method = Method.PUT)
+    @ResponseHandler(SimpleJsonResponseHandler.class)
+    public Request<JSONObject> updateCommentsWithUserId(@Body String putData, @Endpoint String userId, RequestCallbackAdapter<JSONObject> requestCallback);
+
+    @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
+    @ResponseHandler(SimpleJsonResponseHandler.class)
+    public Request<JSONObject> getFetchDataRequest(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel);
+
+    @Method(url = COMMENTS)
+    public Request.Builder<JSONObject> getCommentsRequestBuilder();
+
+    @Method(url = COMMENTS)
+    public Request<JSONArray> getPostsByUserIdParamRequest(@Param("userId") long userId, @Param("id") long id);
+
+    @Method(url = COMMENTS)
+    public void postCommentData(@Part(name = "image", isFile = true) String imageFilePath, @Part(name = "caption") String caption);
 }
 
 ```
