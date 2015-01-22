@@ -340,6 +340,8 @@ public class Request<ResponseType> implements UrlProvider {
     public void execute() {
         if (mExecutor != null) {
             mExecutor.execute(this);
+        } else if (RequestConfig.getSharedExecutor() != null) {
+            RequestConfig.getSharedExecutor().execute(this);
         }
     }
 
@@ -380,7 +382,12 @@ public class Request<ResponseType> implements UrlProvider {
 
         protected Request<ResponseType> mRequest;
 
-        protected Builder() {
+        /**
+         * Constructs the contained {@link com.raizlabs.android.broker.Request} with
+         * the shared {@link com.raizlabs.android.broker.RequestExecutor} from {@link com.raizlabs.android.broker.RequestConfig}
+         */
+        public Builder() {
+            this(RequestConfig.getSharedExecutor());
         }
 
         /**
