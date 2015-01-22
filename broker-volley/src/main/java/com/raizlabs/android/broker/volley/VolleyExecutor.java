@@ -72,17 +72,6 @@ public class VolleyExecutor implements RequestExecutor<String> {
             }
         }
 
-        Response.Listener<String> stringListener = new Response.Listener<String>() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public void onResponse(String s) {
-                RequestCallback requestCallback = request.getCallback();
-                if(requestCallback != null) {
-                    requestCallback.onRequestDone(request.getResponseHandler().handleResponse(s));
-                }
-            }
-        };
-
         Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
@@ -104,7 +93,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
             url = request.getFullUrl();
         }
 
-        com.android.volley.Request volleyRequest = new BrokerVolleyRequest(request, url, stringListener, errorListener);
+        com.android.volley.Request volleyRequest = new BrokerVolleyRequest(request, url, errorListener);
         volleyRequest.setRetryPolicy(mRetryPolicy);
         mQueue.add(volleyRequest);
     }

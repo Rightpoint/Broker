@@ -65,6 +65,8 @@ public class Request<ResponseType> implements UrlProvider {
      */
     private long mBodyLength;
 
+    private File mDownloadToFile;
+
     /**
      * Handles responses for us. The default is to do nothing but return the request.
      */
@@ -182,6 +184,14 @@ public class Request<ResponseType> implements UrlProvider {
         headers.putAll(headers);
     }
 
+    /**
+     * Set the request will download to a file.
+     *
+     * @param mDownloadToFile The data from the request will be downloaded to this file.
+     */
+    void setDownloadToFile(File mDownloadToFile) {
+        this.mDownloadToFile = mDownloadToFile;
+    }
 
     @Override
     public String getBaseUrl() {
@@ -283,6 +293,13 @@ public class Request<ResponseType> implements UrlProvider {
     }
 
     /**
+     * @return The file to download contents of this request to.
+     */
+    public File getDownloadToFile() {
+        return mDownloadToFile;
+    }
+
+    /**
      * @return List of parts that this request contains.
      */
     public List<RequestEntityPart> getParts() {
@@ -308,6 +325,13 @@ public class Request<ResponseType> implements UrlProvider {
      */
     public boolean hasBody() {
         return mBodyLength > 0 && mBody != null;
+    }
+
+    /**
+     * @return True if there is a file specified we want to download the contents to.
+     */
+    public boolean hasFile() {
+        return mDownloadToFile != null;
     }
 
     /**
@@ -380,8 +404,25 @@ public class Request<ResponseType> implements UrlProvider {
             return this;
         }
 
+        /**
+         * Assigns a priority to this request.
+         *
+         * @param priority The priority enum to use
+         * @return
+         */
         public Builder<ResponseType> priority(Priority priority) {
             mRequest.setPriority(priority);
+            return this;
+        }
+
+        /**
+         * Sets a file to download contents of the response to the specified location.
+         *
+         * @param downloadTo The file to store contents of this request.
+         * @return
+         */
+        public Builder<ResponseType> downloadToFile(File downloadTo) {
+            mRequest.setDownloadToFile(downloadTo);
             return this;
         }
 

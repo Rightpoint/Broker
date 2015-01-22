@@ -28,7 +28,7 @@ public class BrokerWebServiceRequest<ResultType> extends BaseWebServiceRequest<R
     /**
      * Constructs a new broker webservice request with our {@link com.raizlabs.android.broker.Request} object.
      *
-     * @param request
+     * @param request The request to wrap and handle the {@link com.raizlabs.net.requests.BaseWebServiceRequest} class.
      */
     public BrokerWebServiceRequest(Request<ResultType> request) {
         mBuilder = new RequestBuilder(WebServiceManagerUtils.convertMethodIntToMethod(request.getMethod()),
@@ -59,7 +59,14 @@ public class BrokerWebServiceRequest<ResultType> extends BaseWebServiceRequest<R
     @SuppressWarnings("unchecked")
     @Override
     protected ResultType translate(Response response) {
-        return (ResultType) mRequest.getResponseHandler().handleResponse(response.getContentAsString());
+
+        // Download content into file specified.
+        if (mRequest.hasFile()) {
+            response.readContentToFile(mRequest.getDownloadToFile(), null);
+            return null;
+        } else {
+            return (ResultType) mRequest.getResponseHandler().handleResponse(response.getContentAsString());
+        }
     }
 
     /**
