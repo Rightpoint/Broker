@@ -224,7 +224,7 @@ Within the function parameters, we must use annotations to specify what paramete
 ```
 
 ### UrlProvider
-It enables enums and other classes to provide a url for the request in a standardized fashion.
+It enables enums and other classes to provide a url for the request in a standardized fashion. We can use build flavors, enums, or other providers to specify different urls for a request.
 
 #### Example
 
