@@ -49,6 +49,7 @@ public class BrokerVolleyRequest<ResponseType> extends com.android.volley.Reques
         if (mRequest.isMultiPart()) {
             mMultiPartEntity = RequestUtils.createMultipartEntity(request);
         }
+        setTag(mRequest.getMetaData());
     }
 
 

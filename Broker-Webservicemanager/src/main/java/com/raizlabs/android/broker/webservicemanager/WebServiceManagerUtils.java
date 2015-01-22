@@ -4,7 +4,7 @@ import com.raizlabs.android.broker.core.Method;
 import com.raizlabs.net.HttpMethod;
 
 /**
- * Description:
+ * Description: Provides utility methods for interacting with WebServiceManager
  */
 public class WebServiceManagerUtils {
 

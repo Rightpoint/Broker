@@ -7,17 +7,17 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpClientStack;
 import com.android.volley.toolbox.Volley;
-import com.raizlabs.android.broker.core.Priority;
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
 import com.raizlabs.android.broker.RequestConfig;
 import com.raizlabs.android.broker.RequestExecutor;
 import com.raizlabs.android.broker.core.Method;
+import com.raizlabs.android.broker.core.Priority;
 
 /**
- * Description:
+ * Description: Provides the default implementation for a volley request.
  */
-public class VolleyExecutor implements RequestExecutor<String> {
+public class VolleyExecutor implements RequestExecutor<Object> {
 
     /**
      * Default timeout set to 15 seconds
@@ -27,7 +27,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
     private static VolleyExecutor sharedExecutor;
 
     public static VolleyExecutor getSharedExecutor() {
-        if(sharedExecutor == null) {
+        if (sharedExecutor == null) {
             sharedExecutor = new VolleyExecutor();
         }
         return sharedExecutor;
@@ -48,6 +48,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
 
     /**
      * Sets a custom stack for us to use in order to manage cookies.
+     *
      * @param stack
      */
     public void setStack(HttpClientStack stack) {
@@ -56,6 +57,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
 
     /**
      * Defines a custom {@link com.android.volley.RetryPolicy} for volley.
+     *
      * @param retryPolicy
      */
     public void setRetryPolicy(RetryPolicy retryPolicy) {
@@ -64,8 +66,8 @@ public class VolleyExecutor implements RequestExecutor<String> {
 
     @Override
     public void execute(final Request request) {
-        if(mQueue == null) {
-            if(mStack == null) {
+        if (mQueue == null) {
+            if (mStack == null) {
                 mQueue = Volley.newRequestQueue(RequestConfig.getContext());
             } else {
                 mQueue = Volley.newRequestQueue(RequestConfig.getContext(), mStack);
@@ -89,7 +91,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
         };
 
         String url = request.getUrl();
-        if(request.getMethod() == Method.GET) {
+        if (request.getMethod() == Method.GET) {
             url = request.getFullUrl();
         }
 
@@ -99,11 +101,11 @@ public class VolleyExecutor implements RequestExecutor<String> {
     }
 
     @Override
-    public void cancelRequest(String tag, final Request request) {
-        if(mQueue != null) {
-            if(tag != null && !tag.equals("")) {
+    public void cancelRequest(Object tag, final Request request) {
+        if (mQueue != null) {
+            if (tag != null && !tag.equals("")) {
                 mQueue.cancelAll(tag);
-            } else{
+            } else {
                 mQueue.cancelAll(new RequestQueue.RequestFilter() {
                     @Override
                     public boolean apply(com.android.volley.Request<?> volleyRequest) {
@@ -118,7 +120,7 @@ public class VolleyExecutor implements RequestExecutor<String> {
 
     @Override
     public void cancelAllRequests() {
-        if(mQueue != null) {
+        if (mQueue != null) {
             mQueue.cancelAll(new RequestQueue.RequestFilter() {
                 @Override
                 public boolean apply(com.android.volley.Request<?> request) {
