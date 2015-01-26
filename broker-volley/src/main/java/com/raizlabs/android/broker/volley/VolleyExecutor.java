@@ -11,7 +11,6 @@ import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
 import com.raizlabs.android.broker.RequestConfig;
 import com.raizlabs.android.broker.RequestExecutor;
-import com.raizlabs.android.broker.core.Method;
 import com.raizlabs.android.broker.core.Priority;
 
 /**
@@ -64,8 +63,10 @@ public class VolleyExecutor implements RequestExecutor<Object> {
         mRetryPolicy = retryPolicy;
     }
 
-    @Override
-    public void execute(final Request request) {
+    /**
+     * @return The queue for the {@link com.raizlabs.android.broker.volley.VolleyExecutor}
+     */
+    public RequestQueue getQueue() {
         if (mQueue == null) {
             if (mStack == null) {
                 mQueue = Volley.newRequestQueue(RequestConfig.getContext());
@@ -73,7 +74,25 @@ public class VolleyExecutor implements RequestExecutor<Object> {
                 mQueue = Volley.newRequestQueue(RequestConfig.getContext(), mStack);
             }
         }
+        return mQueue;
+    }
 
+    /**
+     * @return The stack that is used to execute these requests.
+     */
+    public HttpClientStack getStack() {
+        return mStack;
+    }
+
+    /**
+     * @return The policy for retrying requests.
+     */
+    public RetryPolicy getRetryPolicy() {
+        return mRetryPolicy;
+    }
+
+    @Override
+    public void execute(final Request request) {
         Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
@@ -92,37 +111,33 @@ public class VolleyExecutor implements RequestExecutor<Object> {
 
         com.android.volley.Request volleyRequest = new BrokerVolleyRequest(request, errorListener);
         volleyRequest.setRetryPolicy(mRetryPolicy);
-        mQueue.add(volleyRequest);
+        getQueue().add(volleyRequest);
     }
 
     @Override
     public void cancelRequest(Object tag, final Request request) {
-        if (mQueue != null) {
-            if (tag != null && !tag.equals("")) {
-                mQueue.cancelAll(tag);
-            } else {
-                mQueue.cancelAll(new RequestQueue.RequestFilter() {
-                    @Override
-                    public boolean apply(com.android.volley.Request<?> volleyRequest) {
-                        String url = request.getFullUrl();
-                        String url2 = volleyRequest.getUrl();
-                        return url.equalsIgnoreCase(url2);
-                    }
-                });
-            }
+        if (tag != null && !tag.equals("")) {
+            getQueue().cancelAll(tag);
+        } else {
+            getQueue().cancelAll(new RequestQueue.RequestFilter() {
+                @Override
+                public boolean apply(com.android.volley.Request<?> volleyRequest) {
+                    String url = request.getFullUrl();
+                    String url2 = volleyRequest.getUrl();
+                    return url.equalsIgnoreCase(url2);
+                }
+            });
         }
     }
 
     @Override
     public void cancelAllRequests() {
-        if (mQueue != null) {
-            mQueue.cancelAll(new RequestQueue.RequestFilter() {
+        getQueue().cancelAll(new RequestQueue.RequestFilter() {
                 @Override
                 public boolean apply(com.android.volley.Request<?> request) {
                     return true;
                 }
             });
-        }
     }
 
     @Override

@@ -48,4 +48,8 @@ public interface TestRestInterface2 {
                                                     isFile = true) String albumId,
                                                     @Endpoint String endpoint1,
                                                     @Endpoint String endpoint2);
+    @Method(url = ALBUMS)
+    @ResponseHandler(SimpleJsonArrayResponseHandler.class)
+    public Request<JSONArray> getAllAlbumsAsJSONArray(@Param("albumId") String albumId,
+                                                      RequestCallback<JSONArray> callback);
 }
