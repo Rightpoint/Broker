@@ -6,6 +6,7 @@ import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestConfig;
 import com.raizlabs.android.broker.RequestUtils;
 import com.raizlabs.android.broker.SimpleUrlProvider;
+import com.raizlabs.android.broker.metadata.RequestMetadataGenerator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,10 +26,12 @@ public class TestBuilder extends AndroidTestCase {
         Request.Builder<String> builder = new Request.Builder<>();
         builder.body(BODY_STRING);
         builder.provider(new SimpleUrlProvider(URL));
+        builder.metaDataGenerator(mMetadataGenerator);
 
         Request<String> request = builder.build();
         assertEquals(RequestConfig.getSharedExecutor(), request.getExecutor());
 
+        assertEquals(request.getBaseUrl() + "/silly", request.getMetaData());
 
         assertEquals(BODY_STRING, RequestUtils.readRequestBodyIntoString(request));
 
@@ -49,6 +52,12 @@ public class TestBuilder extends AndroidTestCase {
         assertEquals(testUrl, request.getFullUrl());
 
 
-
     }
+
+    private RequestMetadataGenerator mMetadataGenerator = new RequestMetadataGenerator() {
+        @Override
+        public Object generate(Request request) {
+            return request.getBaseUrl() + "/silly";
+        }
+    };
 }

@@ -3,6 +3,7 @@ package com.raizlabs.android.broker.webservicemanager;
 import com.raizlabs.android.broker.Request;
 import com.raizlabs.android.broker.RequestCallback;
 import com.raizlabs.android.broker.RequestUtils;
+import com.raizlabs.android.broker.core.Method;
 import com.raizlabs.logging.Logger;
 import com.raizlabs.net.requests.BaseWebServiceRequest;
 import com.raizlabs.net.requests.RequestBuilder;
@@ -45,6 +46,11 @@ public class BrokerWebServiceRequest<ResultType> extends BaseWebServiceRequest<R
             }
         }
         mBuilder.addHeaders(request.getHeaders());
+        if (request.getMethod() == Method.PUT
+                || request.getMethod() == Method.POST
+                || request.getMethod() == Method.PATCH) {
+            mBuilder.addHeader(Request.CONTENT_TYPE_HEADER, request.getBodyContentType());
+        }
         mBuilder.addParams(request.getParams());
         mRequest = request;
     }

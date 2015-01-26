@@ -159,8 +159,8 @@ public class BrokerVolleyRequest<ResponseType> extends com.android.volley.Reques
         String contentType;
         if (mMultiPartEntity != null) {
             contentType = mMultiPartEntity.getContentType().getValue();
-        } else if (mRequest.getContentType() != null) {
-            contentType = mRequest.getContentType();
+        } else if (mRequest.getBodyContentType() != null) {
+            contentType = mRequest.getBodyContentType();
         } else {
             contentType = super.getBodyContentType();
         }

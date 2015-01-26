@@ -24,6 +24,8 @@ import java.util.Set;
  */
 public class Request<ResponseType> implements UrlProvider {
 
+    public static final String CONTENT_TYPE_HEADER = "Content-Type";
+
     /**
      * The {@link com.raizlabs.android.broker.UrlProvider} that we use to retrieve the url for this request.
      */
@@ -54,6 +56,11 @@ public class Request<ResponseType> implements UrlProvider {
      * A tag or metadata that ID's this request.
      */
     private Object mMetaData;
+
+    /**
+     * Generates metadata for this request.
+     */
+    private RequestMetadataGenerator mMetadataGenerator;
 
     /**
      * An optional body such as JSON or String that we put in the request.
@@ -151,11 +158,20 @@ public class Request<ResponseType> implements UrlProvider {
     }
 
     /**
-     * Sets the content type of the request
+     * Specify a generator to create metadata from this request in a uniform way so it can be identified.
+     *
+     * @param generator The generator to use based on the data from the request.
+     */
+    void setMetadataGenerator(RequestMetadataGenerator generator) {
+        mMetadataGenerator = generator;
+    }
+
+    /**
+     * Sets the content type of the body of this request
      *
      * @param mContentType
      */
-    void setContentType(String mContentType) {
+    void setBodyContentType(String mContentType) {
         this.mContentType = mContentType;
     }
 
@@ -271,13 +287,16 @@ public class Request<ResponseType> implements UrlProvider {
      * @return Data attached to this request to uniquely identify it.
      */
     public Object getMetaData() {
+        if (mMetaData == null && mMetadataGenerator != null) {
+            mMetaData = mMetadataGenerator.generate(this);
+        }
         return mMetaData;
     }
 
     /**
      * @return The type of content for this request.
      */
-    public String getContentType() {
+    public String getBodyContentType() {
         return mContentType;
     }
 
@@ -462,24 +481,25 @@ public class Request<ResponseType> implements UrlProvider {
         /**
          * Attach a unique ID to this request that the {@link com.raizlabs.android.broker.RequestExecutor}
          * can handle using a {@link com.raizlabs.android.broker.metadata.RequestMetadataGenerator}.
-         * Call this right before execute, so that the parameters of the contained request are all available.
          *
-         * @param generator
+         * @param generator The generator to use based on the data from the request to generate a unique ID.
          * @return
          */
         public Builder<ResponseType> metaDataGenerator(RequestMetadataGenerator generator) {
-            mRequest.setMetaData(generator.generate(mRequest));
+            mRequest.setMetadataGenerator(generator);
             return this;
         }
 
         /**
-         * Sets the contentType header of this request
+         * Sets the contentType header for the body of this request. Only used in methods such as
+         * {@link com.raizlabs.android.broker.core.Method#PATCH} , {@link com.raizlabs.android.broker.core.Method#POST},
+         * and {@link com.raizlabs.android.broker.core.Method#PUT} .
          *
-         * @param contentType
+         * @param contentType The content type to use for this request.
          * @return
          */
-        public Builder<ResponseType> contentType(String contentType) {
-            mRequest.setContentType(contentType);
+        public Builder<ResponseType> bodyContentType(String contentType) {
+            mRequest.setBodyContentType(contentType);
             return this;
         }
 
