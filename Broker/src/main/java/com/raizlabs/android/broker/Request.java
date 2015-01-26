@@ -80,14 +80,17 @@ public class Request<ResponseType> implements UrlProvider {
     /**
      * The URL-encoded params of a {@link com.raizlabs.android.broker.core.Method#GET} request
      */
-    private final Map<String, String> mParams = new LinkedHashMap<>();
+    final Map<String, String> mParams = new LinkedHashMap<>();
 
     /**
      * The headers that get put into the request.
      */
-    private final Map<String, String> mHeaders = new LinkedHashMap<>();
+    final Map<String, String> mHeaders = new LinkedHashMap<>();
 
-    private final Map<String, RequestEntityPart> mPartMap = new LinkedHashMap<>();
+    /**
+     * The parts to place into the request as part of a MultiPartRequest.
+     */
+    final Map<String, RequestEntityPart> mPartMap = new LinkedHashMap<>();
 
     /**
      * The priority this request runs at
@@ -617,6 +620,15 @@ public class Request<ResponseType> implements UrlProvider {
         public Request<ResponseType> build(RequestCallback requestCallback) {
             mRequest.setCallback(requestCallback);
             return mRequest;
+        }
+
+        /**
+         * Executes this request without specifying a {@link com.raizlabs.android.broker.RequestCallback}
+         *
+         * @return
+         */
+        public Request<ResponseType> build() {
+            return build(null);
         }
     }
 

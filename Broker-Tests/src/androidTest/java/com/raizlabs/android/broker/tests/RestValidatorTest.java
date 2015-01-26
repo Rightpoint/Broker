@@ -8,7 +8,6 @@ import com.raizlabs.android.broker.RequestManager;
 import com.raizlabs.android.broker.core.Priority;
 import com.raizlabs.android.broker.multipart.RequestEntityPart;
 import com.raizlabs.android.broker.responsehandler.SimpleJsonArrayResponseHandler;
-import com.raizlabs.android.broker.volley.VolleyExecutor;
 
 import org.json.JSONArray;
 

@@ -90,12 +90,7 @@ public class VolleyExecutor implements RequestExecutor<Object> {
             }
         };
 
-        String url = request.getUrl();
-        if (request.getMethod() == Method.GET) {
-            url = request.getFullUrl();
-        }
-
-        com.android.volley.Request volleyRequest = new BrokerVolleyRequest(request, url, errorListener);
+        com.android.volley.Request volleyRequest = new BrokerVolleyRequest(request, errorListener);
         volleyRequest.setRetryPolicy(mRetryPolicy);
         mQueue.add(volleyRequest);
     }

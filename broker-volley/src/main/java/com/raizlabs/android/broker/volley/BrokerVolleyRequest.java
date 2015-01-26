@@ -42,8 +42,8 @@ public class BrokerVolleyRequest<ResponseType> extends com.android.volley.Reques
      * @param url           - URL formatted url from Request
      * @param errorListener - the listener for an error
      */
-    public BrokerVolleyRequest(Request<ResponseType> request, String url, Response.ErrorListener errorListener) {
-        super(request.getMethod(), url, errorListener);
+    public BrokerVolleyRequest(Request<ResponseType> request, Response.ErrorListener errorListener) {
+        super(request.getMethod(), request.getFullUrl(), errorListener);
         mRequest = request;
 
         if (mRequest.isMultiPart()) {
@@ -175,30 +175,18 @@ public class BrokerVolleyRequest<ResponseType> extends com.android.volley.Reques
             body = super.getBody();
         } else {
 
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             if (mMultiPartEntity != null) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 try {
                     mMultiPartEntity.writeTo(buffer);
                 } catch (IOException e) {
                     VolleyLog.e(e, "Error when writing MultiPart entity");
                 }
+                body = buffer.toByteArray();
+
             } else {
-
-                InputStream requestInputStream = mRequest.getBody();
-                int nRead;
-                byte[] data = new byte[(int) mRequest.getBodyLength()];
-
-                try {
-                    while ((nRead = requestInputStream.read(data, 0, data.length)) != -1) {
-                        buffer.write(data, 0, nRead);
-                    }
-                    buffer.flush();
-                } catch (IOException e) {
-                    VolleyLog.e(e, "Error when writing request body");
-                }
+                body = RequestUtils.readRequestBodyIntoByteArray(mRequest);
             }
-
-            body = buffer.toByteArray();
         }
 
         return body;

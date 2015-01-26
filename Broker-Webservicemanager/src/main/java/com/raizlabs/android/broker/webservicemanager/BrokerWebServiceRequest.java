@@ -44,6 +44,8 @@ public class BrokerWebServiceRequest<ResultType> extends BaseWebServiceRequest<R
                 Logger.e(getClass().getSimpleName(), "Error getting content for the multipart request");
             }
         }
+        mBuilder.addHeaders(request.getHeaders());
+        mBuilder.addParams(request.getParams());
         mRequest = request;
     }
 

@@ -1,11 +1,16 @@
 package com.raizlabs.android.broker;
 
+import android.util.Log;
+
 import com.raizlabs.android.broker.multipart.RequestEntityPart;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Iterator;
@@ -78,5 +83,61 @@ public class RequestUtils {
             }
         }
         return builder.build();
+    }
+
+    /**
+     * Reads an input stream into a byte array.
+     *
+     * @param inputStream       The stream to read from
+     * @param inputStreamLength The length of the specified stream
+     * @return A byte array containing the {@link java.io.InputStream} contents
+     */
+    public static byte[] readStreamIntoByteArray(InputStream inputStream, long inputStreamLength) {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[(int) inputStreamLength];
+
+        try {
+            while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+                buffer.write(data, 0, nRead);
+            }
+            buffer.flush();
+        } catch (IOException e) {
+            Log.e(RequestUtils.class.getSimpleName(), "Error when writing request body: " + e.getMessage());
+        }
+
+        return buffer.toByteArray();
+    }
+
+    /**
+     * Reads an input stream into a byte array that gets converted into a String.
+     *
+     * @param inputStream
+     * @param inputStreamLength
+     * @return A new string with the contents of the {@link java.io.InputStream}
+     */
+    public static String readStreamIntoString(InputStream inputStream, int inputStreamLength) {
+        return new String(readStreamIntoByteArray(inputStream, inputStreamLength));
+    }
+
+    /**
+     * Reads a body from the {@link com.raizlabs.android.broker.Request} into a byte array.
+     *
+     * @param request The request to process body from.
+     * @return The contents of the {@link com.raizlabs.android.broker.Request} body
+     */
+    public static byte[] readRequestBodyIntoByteArray(Request request) {
+        return readStreamIntoByteArray(request.getBody(), request.getBodyLength());
+    }
+
+    /**
+     * Reads a body from the {@link com.raizlabs.android.broker.Request} into a byte-array and then turns
+     * into a String.
+     *
+     * @param request The request to process body from.
+     * @return A new string with the contents of the body of a {@link com.raizlabs.android.broker.Request}
+     */
+    public static String readRequestBodyIntoString(Request request) {
+        return new String(readRequestBodyIntoByteArray(request));
     }
 }
