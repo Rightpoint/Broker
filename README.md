@@ -313,3 +313,7 @@ private class ParserResponseHandler implements ResponseHandler<String, AppConfig
     }
 
 ```
+
+## Maintainers
+
+[agrosner](https://github.com/agrosner) ([@agrosner](https://twitter.com/agrosner))
