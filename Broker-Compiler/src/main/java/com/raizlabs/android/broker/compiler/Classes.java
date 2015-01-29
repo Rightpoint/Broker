@@ -32,4 +32,12 @@ public class Classes {
     public static final String REQUEST_UTILS = REQUEST_PACKAGE + ".RequestUtils";
 
     public static final String REQUEST = REQUEST_PACKAGE + ".Request";
+
+    public static final String REQUEST_CALLBACK = REQUEST_PACKAGE + ".RequestCallback";
+
+    public static final String PRIORITY = REQUEST_PACKAGE + ".core.Priority";
+
+    public static final String REQUEST_CONFIG = REQUEST_PACKAGE + ".RequestConfig";
+
+    public static final String VOID = void.class.getCanonicalName();
 }

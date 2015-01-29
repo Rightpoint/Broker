@@ -18,11 +18,10 @@ import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeMirror;
 
 /**
- * Author: andrewgrosner
- * Contributors: { }
- * Description:
+ * Description: Defines a {@link com.raizlabs.android.broker.core.RestService} annotation.
  */
 public class RestServiceDefinition extends BaseDefinition {
 
@@ -47,24 +46,47 @@ public class RestServiceDefinition extends BaseDefinition {
         baseUrlResId = restService.baseUrlResId();
 
         ResponseHandler responseHandler = typeElement.getAnnotation(ResponseHandler.class);
-        if(responseHandler != null) {
+        if (responseHandler != null) {
             responseHandlerClass = RequestUtils.getResponseHandler(responseHandler);
         } else {
             responseHandlerClass = ResponseHandler.class.getCanonicalName();
         }
 
         RequestExecutor requestExecutor = typeElement.getAnnotation(RequestExecutor.class);
-        if(requestExecutor != null) {
+        if (requestExecutor != null) {
             requestExecutorClass = RequestUtils.getRequestExecutor(requestExecutor);
         } else {
             requestExecutorClass = RequestExecutor.class.getCanonicalName();
         }
 
-        restMethodDefinitions = new ArrayList<RestMethodDefinition>();
+        restMethodDefinitions = new ArrayList<>();
         List<? extends Element> elements = typeElement.getEnclosedElements();
         for (Element element : elements) {
             if (element.getAnnotation(Method.class) != null) {
                 restMethodDefinitions.add(new RestMethodDefinition(requestManager, element));
+            }
+        }
+
+        List<? extends TypeMirror> interfaces = requestManager.getElements().getTypeElement(getFQCN()).getInterfaces();
+        if (!interfaces.isEmpty()) {
+            TypeMirror superclass = interfaces.get(0);
+            while (superclass != null) {
+                TypeElement superElement = ((TypeElement) requestManager.getTypeUtils().asElement(superclass));
+                if (superElement != null) {
+                    List<? extends Element> superElements = superElement.getEnclosedElements();
+                    RestMethodValidator validator = new RestMethodValidator();
+                    for (Element element : superElements) {
+                        if (element.getAnnotation(Method.class) != null) {
+                            RestMethodDefinition restMethodDefinition = new RestMethodDefinition(requestManager, element);
+                            if(validator.validate(requestManager, restMethodDefinition)) {
+                                restMethodDefinitions.add(restMethodDefinition);
+                            }
+                        }
+                    }
+                    superclass = superElement.getSuperclass();
+                } else {
+                    superclass = null;
+                }
             }
         }
     }
@@ -75,7 +97,8 @@ public class RestServiceDefinition extends BaseDefinition {
                 Classes.RESPONSE_HANDLER,
                 Classes.REQUEST_EXECUTOR,
                 Classes.METHOD,
-                Classes.REQUEST
+                Classes.REQUEST,
+                Classes.PRIORITY
         };
     }
 
@@ -102,7 +125,11 @@ public class RestServiceDefinition extends BaseDefinition {
                 Sets.newHashSet(Modifier.PUBLIC, Modifier.FINAL), new Definition() {
                     @Override
                     public void write(JavaWriter javaWriter) throws IOException {
-                        javaWriter.emitStatement("return new %1s()", responseHandlerClass);
+                        if (responseHandlerClass.equals(ResponseHandler.class.getCanonicalName())) {
+                            javaWriter.emitStatement("return %1s.getSharedResponseHandler()", Classes.REQUEST_CONFIG);
+                        } else {
+                            javaWriter.emitStatement("return new %1s()", responseHandlerClass);
+                        }
                     }
                 });
 
@@ -110,7 +137,11 @@ public class RestServiceDefinition extends BaseDefinition {
                 Sets.newHashSet(Modifier.PUBLIC, Modifier.FINAL), new Definition() {
                     @Override
                     public void write(JavaWriter javaWriter) throws IOException {
-                        javaWriter.emitStatement("return new %1s()", requestExecutorClass);
+                        if (requestExecutorClass.equals(RequestExecutor.class.getCanonicalName())) {
+                            javaWriter.emitStatement("return %1s.getSharedExecutor()", Classes.REQUEST_CONFIG);
+                        } else {
+                            javaWriter.emitStatement("return new %1s()", requestExecutorClass);
+                        }
                     }
                 });
 

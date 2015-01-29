@@ -6,7 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Author: andrewgrosner
  * Description: Defines the ResponseHandler for a {@link com.raizlabs.android.broker.core.RestService}.
  * All RestService must have this annotation in its definition.
  */

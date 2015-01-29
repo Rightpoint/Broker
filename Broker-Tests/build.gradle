@@ -1,0 +1,27 @@
+apply plugin: 'com.android.application'
+apply plugin: 'android-apt'
+
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 21
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+}
+
+dependencies {
+    androidTestApt project(request_project_prefix + 'Broker-Compiler')
+    androidTestCompile 'com.raizlabs.android:BaseUtils:1.0.0'
+    androidTestCompile 'com.raizlabs.android:WebServiceManager:1.0.0'
+    androidTestCompile project(request_project_prefix + 'Broker-Volley')
+    androidTestCompile project(request_project_prefix + 'Broker-WebServiceManager')
+
+}

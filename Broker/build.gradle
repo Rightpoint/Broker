@@ -1,22 +1,31 @@
 apply plugin: 'com.android.library'
-apply plugin: 'android-apt'
+apply plugin: 'aar-link-sources'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.0.2"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         minSdkVersion 3
         targetSdkVersion 21
     }
+
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
 }
 
 dependencies {
-    androidTestApt project(request_project_prefix + 'Broker-Compiler')
     compile project(request_project_prefix + "Broker-Core")
 
-    compile files('libs/volley.jar')
-
+    compile 'org.apache.httpcomponents:httpcore:4.4@jar'
+    aarLinkSources 'org.apache.httpcomponents:httpcore:4.4:sources@jar'
+    compile 'org.apache.httpcomponents:httpmime:4.3.6'
+    aarLinkSources 'org.apache.httpcomponents:httpmime:4.3.6:sources@jar'
 }
 
+apply from: '../android_artifacts.gradle'
 apply from: '../github_deploy.gradle'

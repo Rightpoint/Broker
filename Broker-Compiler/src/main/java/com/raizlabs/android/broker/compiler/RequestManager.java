@@ -7,6 +7,7 @@ import com.raizlabs.android.broker.compiler.definition.RestServiceDefinition;
 import com.squareup.javawriter.JavaWriter;
 
 import java.io.IOException;
+import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -14,13 +15,15 @@ import java.util.Set;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 /**
- * Author: andrewgrosner
- * Contributors: { }
- * Description: Holds all of the RequestService information
+ * Description: Holds all of the compiler information and provides some handy methods to assist in
+ * the processing.
  */
 public class RequestManager implements Definition{
 
@@ -44,12 +47,16 @@ public class RequestManager implements Definition{
         return processingEnvironment;
     }
 
+    public Types getTypeUtils() {
+        return processingEnvironment.getTypeUtils();
+    }
+
     public void logError(Throwable t) {
         processingEnvironment.getMessager().printMessage(Diagnostic.Kind.ERROR, t.getMessage());
     }
 
-    public void logError(String error) {
-        processingEnvironment.getMessager().printMessage(Diagnostic.Kind.ERROR, error);
+    public void logError(String error, Object...args) {
+        processingEnvironment.getMessager().printMessage(Diagnostic.Kind.ERROR, String.format(error, args));
     }
 
     @Override
@@ -89,5 +96,9 @@ public class RequestManager implements Definition{
 
     public Filer getFiler() {
         return processingEnvironment.getFiler();
+    }
+
+    public DeclaredType getDeclaredType(String fqTn, TypeMirror...typeArgs) {
+        return getTypeUtils().getDeclaredType(getElements().getTypeElement(fqTn), typeArgs);
     }
 }

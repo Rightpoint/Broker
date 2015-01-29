@@ -3,7 +3,7 @@ apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.0"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "com.raizlabs.android.myapplication"
@@ -27,4 +27,5 @@ dependencies {
     apt project(request_project_prefix + "Broker-Compiler")
     compile project(request_project_prefix + "Broker-Core")
     compile project(request_project_prefix + "Broker")
+    compile project(request_project_prefix + "Broker-Volley")
 }

@@ -52,7 +52,14 @@ public class SimpleUrlProvider implements UrlProvider {
      */
     public SimpleUrlProvider(String baseUrl, String url, int method) {
         mBaseUrl = baseUrl;
-        mUrl = url;
+
+        // If combining urls, we should add a leading slash if the url does not contain one.
+        if(mBaseUrl !=null && mBaseUrl.length() > 0
+                && url != null && !url.startsWith("/")) {
+            mUrl = "/" + url;
+        } else {
+            mUrl = url;
+        }
         mMethod = method;
     }
 

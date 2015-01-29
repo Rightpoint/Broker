@@ -1,10 +1,16 @@
 package com.raizlabs.android.broker.core;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
- * Author: andrewgrosner
  * Description: Defines a custom RequestExecutor for a {@link com.raizlabs.android.broker.core.RestService}. The
  * default is a VolleyExecutor.
  */
+@Retention(RetentionPolicy.SOURCE)
+@Target(ElementType.TYPE)
 public @interface RequestExecutor {
 
     /**

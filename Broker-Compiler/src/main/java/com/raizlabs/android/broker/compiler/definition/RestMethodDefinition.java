@@ -2,6 +2,7 @@ package com.raizlabs.android.broker.compiler.definition;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.raizlabs.android.broker.compiler.Classes;
 import com.raizlabs.android.broker.compiler.RequestManager;
 import com.raizlabs.android.broker.compiler.RequestUtils;
 import com.raizlabs.android.broker.compiler.RestParameterMatcher;
@@ -13,6 +14,8 @@ import com.raizlabs.android.broker.core.Header;
 import com.raizlabs.android.broker.core.Metadata;
 import com.raizlabs.android.broker.core.Method;
 import com.raizlabs.android.broker.core.Param;
+import com.raizlabs.android.broker.core.Part;
+import com.raizlabs.android.broker.core.Priority;
 import com.raizlabs.android.broker.core.ResponseHandler;
 import com.squareup.javawriter.JavaWriter;
 
@@ -24,7 +27,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 
 /**
  * Author: andrewgrosner
@@ -34,6 +39,8 @@ import javax.lang.model.type.TypeMirror;
 public class RestMethodDefinition implements Definition {
 
     ExecutableElement element;
+
+    Element returnType;
 
     RequestManager requestManager;
 
@@ -45,28 +52,74 @@ public class RestMethodDefinition implements Definition {
 
     int methodType;
 
-    final Map<String, String> headers = Maps.newHashMap();
+    final Map<String, String> headers = Maps.newLinkedHashMap();
 
-    private String[] paramCouples;
+    final Map<String, Part> partMap = Maps.newLinkedHashMap();
+
+    String[] paramCouples;
 
     String metaDataParamName;
 
     /**
      * The name of the variable that is the body
      */
-    private String body;
+    String body;
 
     String responseHandler;
 
-    Map<String, Param> urlParams;
+    Map<String, Param> urlParams = Maps.newLinkedHashMap();
+
+    VariableElement callbackParam;
+
+    String requestCallbackName = "null";
+
+    boolean returnsRequest = false;
+
+    boolean returnsRequestBuilder = false;
+
+    boolean returnsVoid = false;
+
+    Priority priority;
 
     public RestMethodDefinition(RequestManager requestManager, Element inElement) {
         this.requestManager = requestManager;
         method = inElement.getAnnotation(Method.class);
         element = (ExecutableElement) inElement;
+
+        Types types = requestManager.getTypeUtils();
+        DeclaredType callbackType = requestManager.getDeclaredType(Classes.REQUEST_CALLBACK,
+                types.getWildcardType(null, null));
+        DeclaredType requestType = requestManager.getDeclaredType(Classes.REQUEST,
+                types.getWildcardType(null, null));
+        DeclaredType requestTypeBuilder = requestManager.getDeclaredType(Classes.REQUEST_BUILDER,
+                types.getWildcardType(null, null));
+
+        returnType = requestManager.getTypeUtils().asElement(element.getReturnType());
+        if (returnType != null) {
+            returnsRequest = RequestUtils.implementsClassSuper(types, requestType, returnType)
+                    || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST, returnType);
+
+            if(!returnsRequest) {
+                returnsRequestBuilder = RequestUtils.implementsClassSuper(types, requestTypeBuilder, returnType)
+                        || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_BUILDER, returnType);
+            }
+
+            if(!returnsRequest && !returnsRequestBuilder) {
+                returnsVoid = RequestUtils.implementsClassSuper(types, requestManager.getDeclaredType(Classes.VOID), returnType)
+                        || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.VOID, returnType);
+            }
+
+        }
+
         elementName = element.getSimpleName().toString();
 
         url = method.url();
+        priority = method.priority();
+
+        // add leading slash if missing
+        if(url != null && url.length() > 0 && !url.startsWith("/")) {
+            url = "/" + url;
+        }
 
         methodType = method.method();
 
@@ -74,6 +127,17 @@ public class RestMethodDefinition implements Definition {
         for (Header header : headers) {
             this.headers.put(header.name(), "\"" + header.value() + "\"");
         }
+
+        Param[] paramArray = method.params();
+        for(Param param: paramArray) {
+            this.urlParams.put(param.name(), param);
+        }
+
+        Part[] parts = method.parts();
+        for(Part part: parts) {
+            this.partMap.put(part.value(), part);
+        }
+
 
         if(inElement.getAnnotation(ResponseHandler.class) != null) {
             responseHandler = RequestUtils.getResponseHandler(inElement.getAnnotation(ResponseHandler.class));
@@ -86,27 +150,47 @@ public class RestMethodDefinition implements Definition {
 
         Map<String, String> endpoints = Maps.newHashMap();
 
-        urlParams = Maps.newHashMap();
-
         for (int i = 0; i < paramCouples.length; i += 2) {
             VariableElement variableElement = params.get(i / 2);
+            Element scrubbed = requestManager.getTypeUtils().asElement(requestManager.getTypeUtils().erasure(variableElement.asType()));
             TypeMirror type = variableElement.asType();
             String name = variableElement.getSimpleName().toString();
             paramCouples[i + 1] = name;
             paramCouples[i] = type.toString();
 
-            if (variableElement.getAnnotation(Endpoint.class) != null) {
+            // determine if requestcallback is a superclass of the param
+
+
+            boolean isCallback = RequestUtils.implementsClassSuper(types, callbackType, variableElement)
+                    || (scrubbed != null && RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_CALLBACK, scrubbed));
+
+            // prioritize callbacks
+            if(isCallback) {
+                if(callbackParam != null) {
+                    requestManager.logError("Duplicate callback params found for method %1s.", elementName);
+                }
+                callbackParam = variableElement;
+                requestCallbackName = callbackParam.getSimpleName().toString();
+            } else if (variableElement.getAnnotation(Endpoint.class) != null) {
                 endpoints.put(name, name);
             } else if (variableElement.getAnnotation(Header.class) != null) {
                 Header header = variableElement.getAnnotation(Header.class);
                 this.headers.put(header.value(), name);
             } else if (variableElement.getAnnotation(Body.class) != null) {
+                if(!body.isEmpty()) {
+                    requestManager.logError("Duplicate Body found for method %1s.", elementName);
+                }
                 body = name;
             } else if (variableElement.getAnnotation(Param.class) != null) {
                 Param param = variableElement.getAnnotation(Param.class);
                 urlParams.put(name, param);
             } else if (variableElement.getAnnotation(Metadata.class) != null) {
+                if(!metaDataParamName.isEmpty()) {
+                    requestManager.logError("Duplicate Metadata found for method %1s. Consider making a List or Map", elementName);
+                }
                 metaDataParamName = name;
+            } else if (variableElement.getAnnotation(Part.class) != null) {
+                partMap.put(name, variableElement.getAnnotation(Part.class));
             }
         }
 
@@ -116,6 +200,9 @@ public class RestMethodDefinition implements Definition {
                 String param = replaceParams.get(i);
                 newUrl = newUrl.replaceFirst("\\{" + param + "\\}", "\" + " + endpoints.get(param) + " + \"");
             }
+        } else {
+            requestManager.logError("Parameters for %1s did not match the count of the endpoints defined. " +
+                    "Please fix and try again", elementName);
         }
 
         url = newUrl;
@@ -128,8 +215,8 @@ public class RestMethodDefinition implements Definition {
                 Sets.newHashSet(Modifier.PUBLIC, Modifier.FINAL), new Definition() {
                     @Override
                     public void write(JavaWriter javaWriter) throws IOException {
-                        RequestStatementBuilder builder = new RequestStatementBuilder().appendEmpty()
-                                .appendRequest().appendEmpty()
+                        RequestStatementBuilder builder = new RequestStatementBuilder(!returnsRequestBuilder)
+                                .appendEmpty().appendRequest().appendEmpty()
                                 .appendResponseHandler(responseHandler).appendEmpty();
                         if (!headers.isEmpty()) {
                             builder.appendHeaders(headers).appendEmpty();
@@ -160,17 +247,37 @@ public class RestMethodDefinition implements Definition {
                             method = "";
                         }
 
-                        builder.appendProvider(method, url);
+                        if(!method.isEmpty()) {
+                            builder.appendProvider(method, url);
+                        } else {
+                            builder.append(String.format(".provider(new %1s(getFullBaseUrl(), \"%1s\", %1s))",
+                                    Classes.SIMPLE_URL_PROVIDER, url, methodType));
+                        }
+
                         if (metaDataParamName != null && !metaDataParamName.isEmpty()) {
                             builder.appendEmpty().appendMetaData(metaDataParamName);
                         }
 
                         builder.appendUrlParams(urlParams);
-                        builder.appendEmpty().appendBuild();
+                        builder.appendParts(partMap);
+                        builder.appendEmpty();
+                        builder.appendPriority(priority);
+
+                        if(!returnsRequestBuilder) {
+                            builder.appendBuild(requestCallbackName);
+                        }
 
                         javaWriter.emitStatement(builder.getStatement());
 
-                        javaWriter.emitStatement("request.execute()");
+                        if(returnsVoid) {
+                            javaWriter.emitStatement("request.execute()");
+                        } else if(returnsRequest) {
+                            javaWriter.emitStatement("return request");
+                        } else if(returnsRequestBuilder) {
+                            javaWriter.emitStatement("return requestBuilder");
+                        } else {
+                            javaWriter.emitStatement("Wrong return type");
+                        }
                     }
                 }, paramCouples);
     }

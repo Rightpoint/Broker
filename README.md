@@ -1,9 +1,8 @@
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Broker-red.svg?style=flat)](https://android-arsenal.com/details/1/1256) [![Raizlabs Repository](http://img.shields.io/badge/Raizlabs%20Repository-1.0.0-blue.svg?style=flat)](https://github.com/Raizlabs/maven-releases)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Broker-red.svg?style=flat)](https://android-arsenal.com/details/1/1256) [![Raizlabs Repository](http://img.shields.io/badge/Raizlabs%20Repository-1.1.0-blue.svg?style=flat)](https://github.com/Raizlabs/maven-releases)
 
 # Broker
 
-A façade between executing requests and creating them. The library provides an interface for creating requests, but delegates the actual execution to ```RequestExecutors```. It also generates REST services for you using **annotation processing**.
-
+A façade between executing requests and creating them. The library provides a wrapper for creating requests, but delegates the actual execution to ```RequestExecutors``` to enable a unified API for requests. It also utilizes **annotation processing** when creating REST interfaces to simplify code you write dramatically. 
 
 ## Getting Started
 
@@ -27,15 +26,37 @@ Add this line to your build.gradle, using the [apt plugin](https://bitbucket.org
 ```groovy
 
 dependencies {
-  apt 'com.raizlabs.android:Broker-Compiler:1.0.0'
-  aarLinkSources 'com.raizlabs.android:Broker-Compiler:1.0.0:sources@jar'
-  compile 'com.raizlabs.android:Broker-Core:1.0.0'
-  aarLinkSources 'com.raizlabs.android:Broker-Core:1.0.0:sources@jar'
-  compile 'com.raizlabs.android:Broker: 1.0.0'
-  aarLinkSources 'com.raizlabs.android:Broker:1.0.0:sources@jar'
+  apt 'com.raizlabs.android:Broker-Compiler:1.1.0'
+  aarLinkSources 'com.raizlabs.android:Broker-Compiler:1.1.0:sources@jar'
+  compile 'com.raizlabs.android:Broker-Core:1.1.0'
+  aarLinkSources 'com.raizlabs.android:Broker-Core:1.1.0:sources@jar'
+  compile 'com.raizlabs.android:Broker: 1.1.0'
+  aarLinkSources 'com.raizlabs.android:Broker:1.1.0:sources@jar'
 
 }
 
+
+```
+
+#### Volley Support
+
+To use the provided ```VolleyExecutor```, add these lines:
+
+```java
+
+      compile 'com.raizlabs.android:Broker-Volley:1.1.0'
+      aarLinkSources 'com.raizlabs.android:Broker-Volley:1.1.0:sources@jar'
+
+```
+
+#### WebServiceManager
+
+To use ```WebServiceManager``` ([repo](https://github.com/Raizlabs/RZAndroidWebServiceManager)), add these lines:
+
+```java
+
+      compile 'com.raizlabs.android:Broker-WebServiceManager:1.1.0'
+      aarLinkSources 'com.raizlabs.android:Broker-WebServiceManager:1.1.0:sources@jar'
 
 ```
 
@@ -57,41 +78,47 @@ Add these lines to your build.gradle:
 
 ## Usage
 
-### Running a simple request
+### Configuration
 
-Requests "google.com" and expects to receive a JSON response. The ```Request.Builder``` class when calling ```build()``` returns a read-only ```Request``` object. To run the request, call ```execute()```.
+You will need to extend the ```Application``` class for proper configuration:
 
 ```java
 
-private RequestExecutor<String> mRequestExecutor = new VolleyExecutor();
+public class ExampleApplication extends Application {
 
-private void someMethod(){
-  new Request.Builder<String>(mRequestExecutor)
-        .provider(new SimpleUrlProvider("http://www.google.com/")
-        .responseHandler(new SimpleJsonResponseHandler())
-        .build(mRequestCallback).execute();
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // replace sharedExecutor with the default executor you wish to use
+        RequestConfig.init(this, sharedExecutor);
+    }
 }
 
-private RequestCallback<JSONObject> mRequestCallback = new RequestCallback<JSONObject>() {
-        @Override
-        public void onRequestDone(JSONObject data) {
-           // Success
-        }
+```
 
-        @Override
-        public void onRequestError(Throwable error, String stringError) {
-            // There was an error, stringError is string rep of the error
-        }
-    };
+In order to set up the library properly, you will need to use one of the following for the shared ```requestExecutor```:
+  1. ```VolleyExecutor``` from ```Broker-Volley```
+  2. ```WebServiceManagerExecutor``` from ```Broker-WebServiceManager```
+  3. A custom ```RequestExecutor```
+
+
+Lastly, add the definition to the manifest (with the name that you chose for your custom application):
+
+```xml
+
+<application
+  android:name="{packageName}.ExampleApplication"
+  ...>
+</application>
 
 ```
 
 ### Request and Request.Builder
 
-This is the main object that we use to execute our requests. It requires the following:
+A ```Request``` requires the following:
 
 1. ```UrlProvider``` : an interface that makes it easy to specify a method, base url, and end url. Simple implementation is the ```SimpleUrlProvider```. 
-2. ```RequestExecutor``` : actually handles the request and is up to the executor how the request is run. 
+2. ```RequestExecutor``` : actually handles the request and is up to the executor how the request is run. Constructing one without one specified will run the shared executor from ```RequestConfig```.
 3. A predefined ``ResponseType`` that must match the ```ResponseHandler```'s return type.
 
 Supports:
@@ -101,22 +128,28 @@ Supports:
 3. Url Params
 4. Request headers
 5. Adding metadata to attach to the specific request
+6. Multipart data
+7. Downloading files to a predetermined location.
+8. Priority
 
 ### REST Interfaces
 
-This library supports annotation processing for generating ```$RestService``` classes that contain all of the code of constructing the intended request. We use annotation processing since it is **transparent** (can read the code that is generated), and as fast as native when executed. 
+This library supports annotation processing for generating ```$RestService``` classes that contain all of the code of constructing the intended request. This enables the call to these interfaces as fast as possible.
 
-Each REST interface must be an __interface__ since the generated code has a base class.
+Note: Each REST interface must be an __interface__ since the generated code has a base class.
+
+Features:
+  1. Define own ```RequestExecutor```
+  2. Define a shared ```ResponseHandler```, otherwise use a shared map of them.
+  3. BaseUrl as a string or resource id.
 
 #### Simple example
 
-For this example we are purely making up URLs and data. For the specified class to build correctly, we 
-need to define 3 annotations:
+For this example we use dummy data and define 3 annotations:
 
 ```@RestService```: Specify either a baseUrl or baseUrlResId for the service
-```@RequestExecutor```: Tells what ```RequestExecutor``` to create for this service to use. The default is a shared ```VolleyExecutor```. 
+```@RequestExecutor```: Tells what ```RequestExecutor``` to create for this service to use. The default is a shared ```RequestConfig.getSharedExecutor()```. 
 ```@ResponseHandler```: Defines the default ```ResponseHandler``` class to use if none is specified for each ```@Method```.
-
 
 ```java
 
@@ -131,7 +164,7 @@ public interface SimpleRestService {
 
 Next we define each ```@Method``` we want to generate from this interface. 
 
-```@Method```: Defines a url (that's appended to the end of the base url), what HTTP method to use (use ```@Method``` constants), and static HTTP headers. Each must contain a ```RequestCallback``` and return void, or return ```Request``` without the ```RequestCallback``` to be valid.
+```@Method```: Defines a url (that's appended to the end of the base url), what HTTP method to use (use ```@Method``` constants), and static HTTP headers. If we place any string within it enclosed by "{}" it becomes an ```@Endpoint``` variable with the same name. 
 
 Within the function parameters, we must use annotations to specify what parameter goes where:
 
@@ -147,32 +180,51 @@ Within the function parameters, we must use annotations to specify what paramete
 
 ```@Body```: The parameter is the body to the request. It must be a String, ```InputStream```, or ```File```. 
 
+```@Part```: The part of a multipart request. If ```isFile()``` true, the variable its associated with becomes the path, otherwise it is the text value of the part.
 
 ```java
 
-    @Method(url = "/users/{userName}/{password}",
-            headers = {@Header(name = "MAC", value = "OS")})
-    public void getUsers(@Endpoint String password, @Endpoint String userName, @Header("User-Agent") String userAgent, RequestCallback<JSONObject> requestCallback);
+    public static final String POSTS = "posts";
 
-    @Method(url = "/users/{firstName}", method = Method.PUT)
-    public void putFirstName(@Endpoint String firstName, @Body String requestBody, RequestCallback<JSONObject> requestCallback);
+    public static final String COMMENTS = "comments";
 
-    @Method(url = "/hello/{goodBye}", method = Method.DELETE)
-    public void deleteGoodbye(@Param("myNameIs") String what,
-                              @Param("jasonSays") String yeah,
-                              @Endpoint String goodBye,
-                              @Metadata double flack,
-                              RequestCallback<JSONObject> requestCallback);
 
-    @Method(url = "/hello/yep")
-    @ResponseHandler(SimpleJsonArrayResponseHandler.class)
-    public void getYep(RequestCallback<JSONArray> requestCallback);
+    @Method(url = POSTS)
+    public void fetchPostsByUserId(@Param("userId") long userID,
+                                   RequestCallback<JSONArray> requestCallback);
+
+    @Method(url = POSTS)
+    public void fetchAllPosts(JsonArrayCallback requestCallback);
+
+    @Method(url = COMMENTS)
+    public void fetchAllComments(JsonArrayCallback callback);
+
+    @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
+    public void fetchData(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel,
+                          RequestCallback<JSONArray> jsonArrayRequestCallback);
+
+    @Method(url = POSTS + "/{userId}", method = Method.PUT)
+    @ResponseHandler(SimpleJsonResponseHandler.class)
+    public Request<JSONObject> updateCommentsWithUserId(@Body String putData, @Endpoint String userId, RequestCallbackAdapter<JSONObject> requestCallback);
+
+    @Method(url = "/{firstLevel}/{secondLevel}/{thirdLevel}")
+    @ResponseHandler(SimpleJsonResponseHandler.class)
+    public Request<JSONObject> getFetchDataRequest(@Endpoint String firstLevel, @Endpoint String secondLevel, @Endpoint String thirdLevel);
+
+    @Method(url = COMMENTS)
+    public Request.Builder<JSONObject> getCommentsRequestBuilder();
+
+    @Method(url = COMMENTS)
+    public Request<JSONArray> getPostsByUserIdParamRequest(@Param("userId") long userId, @Param("id") long id);
+
+    @Method(url = COMMENTS)
+    public void postCommentData(@Part(name = "image", isFile = true) String imageFilePath, @Part(name = "caption") String caption);
 }
 
 ```
 
 ### UrlProvider
-It enables enums and other classes to provide a url for the request in a standardized fashion.
+It enables enums and other classes to provide a url for the request in a standardized fashion. We can use build flavors, enums, or other providers to specify different urls for a request.
 
 #### Example
 
