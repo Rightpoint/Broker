@@ -28,6 +28,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
@@ -104,11 +105,8 @@ public class RestMethodDefinition implements Definition {
                         || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_BUILDER, returnType);
             }
 
-            if(!returnsRequest && !returnsRequestBuilder) {
-                returnsVoid = RequestUtils.implementsClassSuper(types, requestManager.getDeclaredType(Classes.VOID), returnType)
-                        || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.VOID, returnType);
-            }
-
+        } else if (element.getReturnType().getKind().equals(TypeKind.VOID)) {
+            returnsVoid = true;
         }
 
         elementName = element.getSimpleName().toString();
