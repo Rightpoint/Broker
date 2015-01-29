@@ -2,6 +2,8 @@ package com.raizlabs.android.broker.compiler.handler;
 
 import com.raizlabs.android.broker.compiler.RequestManager;
 import com.raizlabs.android.broker.compiler.definition.RestServiceDefinition;
+import com.raizlabs.android.broker.compiler.definition.RestServiceValidator;
+import com.raizlabs.android.broker.compiler.definition.Validator;
 import com.raizlabs.android.broker.core.RestService;
 import com.squareup.javawriter.JavaWriter;
 
@@ -18,19 +20,23 @@ import javax.lang.model.element.TypeElement;
 public class RestServiceHandler extends BaseHandler {
 
     public RestServiceHandler() {
-        super(RestService.class);
+        super(RestService.class, new RestServiceValidator());
     }
 
     @Override
-    protected void onProcessElement(RequestManager requestManager, RoundEnvironment roundEnvironment, TypeElement element) {
+    @SuppressWarnings("unchecked")
+    protected void onProcessElement(RequestManager requestManager, RoundEnvironment roundEnvironment,
+                                    TypeElement element, Validator validator) {
         RestServiceDefinition restServiceDefinition = new RestServiceDefinition(requestManager, element);
-        try {
-            JavaWriter javaWriter = new JavaWriter(requestManager.getProcessingEnvironment().getFiler()
-                    .createSourceFile(restServiceDefinition.getSourceFileName()).openWriter());
-            restServiceDefinition.write(javaWriter);
-            requestManager.addRestServiceDefinition(restServiceDefinition);
-        } catch (IOException e) {
-            requestManager.logError(e);
+        if(validator.validate(requestManager, restServiceDefinition)) {
+            try {
+                JavaWriter javaWriter = new JavaWriter(requestManager.getProcessingEnvironment().getFiler()
+                        .createSourceFile(restServiceDefinition.getSourceFileName()).openWriter());
+                restServiceDefinition.write(javaWriter);
+                requestManager.addRestServiceDefinition(restServiceDefinition);
+            } catch (IOException e) {
+                requestManager.logError(e);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.raizlabs.android.broker.compiler.handler;
 
 import com.raizlabs.android.broker.compiler.RequestManager;
+import com.raizlabs.android.broker.compiler.definition.Validator;
 
 import java.lang.annotation.Annotation;
 import java.util.Set;
@@ -18,8 +19,11 @@ public abstract class BaseHandler implements Handler {
 
     private Class<? extends Annotation> annotationClass;
 
-    public BaseHandler(Class<? extends Annotation> annotationClass) {
+    private Validator mValidator;
+
+    public BaseHandler(Class<? extends Annotation> annotationClass, Validator validator) {
         this.annotationClass = annotationClass;
+        mValidator = validator;
     }
 
     @Override
@@ -27,9 +31,10 @@ public abstract class BaseHandler implements Handler {
         Set<? extends Element> elementSet = roundEnvironment.getElementsAnnotatedWith(annotationClass);
 
         for(Element element: elementSet) {
-            onProcessElement(requestManager, roundEnvironment, (TypeElement) element);
+            onProcessElement(requestManager, roundEnvironment, (TypeElement) element, mValidator);
         }
     }
 
-    protected abstract void onProcessElement(RequestManager requestManager, RoundEnvironment roundEnvironment, TypeElement element);
+    protected abstract void onProcessElement(RequestManager requestManager, RoundEnvironment roundEnvironment,
+                                             TypeElement element, Validator validator);
 }

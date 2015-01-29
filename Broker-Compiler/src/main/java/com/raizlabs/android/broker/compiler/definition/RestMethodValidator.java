@@ -3,7 +3,7 @@ package com.raizlabs.android.broker.compiler.definition;
 import com.raizlabs.android.broker.compiler.RequestManager;
 
 /**
- * Description:
+ * Description: Validates RestMethod data to ensure proper usage
  */
 public class RestMethodValidator implements Validator<RestMethodDefinition> {
 
@@ -26,14 +26,12 @@ public class RestMethodValidator implements Validator<RestMethodDefinition> {
             success = false;
         }
 
-        if(restMethodDefinition.body != null && !restMethodDefinition.body.isEmpty()
+        if (restMethodDefinition.body != null && !restMethodDefinition.body.isEmpty()
                 && !restMethodDefinition.partMap.isEmpty()) {
             requestManager.logError("A Multipart request for RestMethod %1s will override the body of request",
                     restMethodDefinition.elementName);
             success = false;
         }
-
-
 
         return success;
     }

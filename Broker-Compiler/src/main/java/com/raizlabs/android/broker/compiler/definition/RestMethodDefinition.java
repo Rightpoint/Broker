@@ -247,7 +247,13 @@ public class RestMethodDefinition implements Definition {
                             method = "";
                         }
 
-                        builder.appendProvider(method, url);
+                        if(!method.isEmpty()) {
+                            builder.appendProvider(method, url);
+                        } else {
+                            builder.append(String.format(".provider(new %1s(getFullBaseUrl(), \"%1s\", %1s))",
+                                    Classes.SIMPLE_URL_PROVIDER, url, methodType));
+                        }
+
                         if (metaDataParamName != null && !metaDataParamName.isEmpty()) {
                             builder.appendEmpty().appendMetaData(metaDataParamName);
                         }
@@ -263,12 +269,14 @@ public class RestMethodDefinition implements Definition {
 
                         javaWriter.emitStatement(builder.getStatement());
 
-                        if(!returnsRequest && !returnsRequestBuilder) {
+                        if(returnsVoid) {
                             javaWriter.emitStatement("request.execute()");
                         } else if(returnsRequest) {
                             javaWriter.emitStatement("return request");
                         } else if(returnsRequestBuilder) {
                             javaWriter.emitStatement("return requestBuilder");
+                        } else {
+                            javaWriter.emitStatement("Wrong return type");
                         }
                     }
                 }, paramCouples);

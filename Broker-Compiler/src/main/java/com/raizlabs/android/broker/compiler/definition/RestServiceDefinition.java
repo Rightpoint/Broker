@@ -74,9 +74,13 @@ public class RestServiceDefinition extends BaseDefinition {
                 TypeElement superElement = ((TypeElement) requestManager.getTypeUtils().asElement(superclass));
                 if (superElement != null) {
                     List<? extends Element> superElements = superElement.getEnclosedElements();
+                    RestMethodValidator validator = new RestMethodValidator();
                     for (Element element : superElements) {
                         if (element.getAnnotation(Method.class) != null) {
-                            restMethodDefinitions.add(new RestMethodDefinition(requestManager, element));
+                            RestMethodDefinition restMethodDefinition = new RestMethodDefinition(requestManager, element);
+                            if(validator.validate(requestManager, restMethodDefinition)) {
+                                restMethodDefinitions.add(restMethodDefinition);
+                            }
                         }
                     }
                     superclass = superElement.getSuperclass();
