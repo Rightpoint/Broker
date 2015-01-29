@@ -40,6 +40,8 @@ public class RestMethodDefinition implements Definition {
 
     ExecutableElement element;
 
+    Element returnType;
+
     RequestManager requestManager;
 
     String elementName;
@@ -54,14 +56,14 @@ public class RestMethodDefinition implements Definition {
 
     final Map<String, Part> partMap = Maps.newLinkedHashMap();
 
-    private String[] paramCouples;
+    String[] paramCouples;
 
     String metaDataParamName;
 
     /**
      * The name of the variable that is the body
      */
-    private String body;
+    String body;
 
     String responseHandler;
 
@@ -74,6 +76,8 @@ public class RestMethodDefinition implements Definition {
     boolean returnsRequest = false;
 
     boolean returnsRequestBuilder = false;
+
+    boolean returnsVoid = false;
 
     Priority priority;
 
@@ -90,7 +94,7 @@ public class RestMethodDefinition implements Definition {
         DeclaredType requestTypeBuilder = requestManager.getDeclaredType(Classes.REQUEST_BUILDER,
                 types.getWildcardType(null, null));
 
-        Element returnType = requestManager.getTypeUtils().asElement(element.getReturnType());
+        returnType = requestManager.getTypeUtils().asElement(element.getReturnType());
         if (returnType != null) {
             returnsRequest = RequestUtils.implementsClassSuper(types, requestType, returnType)
                     || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST, returnType);
@@ -98,6 +102,11 @@ public class RestMethodDefinition implements Definition {
             if(!returnsRequest) {
                 returnsRequestBuilder = RequestUtils.implementsClassSuper(types, requestTypeBuilder, returnType)
                         || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_BUILDER, returnType);
+            }
+
+            if(!returnsRequest && !returnsRequestBuilder) {
+                returnsVoid = RequestUtils.implementsClassSuper(types, requestManager.getDeclaredType(Classes.VOID), returnType)
+                        || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.VOID, returnType);
             }
 
         }
@@ -157,6 +166,9 @@ public class RestMethodDefinition implements Definition {
 
             // prioritize callbacks
             if(isCallback) {
+                if(callbackParam != null) {
+                    requestManager.logError("Duplicate callback params found for method %1s.", elementName);
+                }
                 callbackParam = variableElement;
                 requestCallbackName = callbackParam.getSimpleName().toString();
             } else if (variableElement.getAnnotation(Endpoint.class) != null) {
@@ -165,11 +177,17 @@ public class RestMethodDefinition implements Definition {
                 Header header = variableElement.getAnnotation(Header.class);
                 this.headers.put(header.value(), name);
             } else if (variableElement.getAnnotation(Body.class) != null) {
+                if(!body.isEmpty()) {
+                    requestManager.logError("Duplicate Body found for method %1s.", elementName);
+                }
                 body = name;
             } else if (variableElement.getAnnotation(Param.class) != null) {
                 Param param = variableElement.getAnnotation(Param.class);
                 urlParams.put(name, param);
             } else if (variableElement.getAnnotation(Metadata.class) != null) {
+                if(!metaDataParamName.isEmpty()) {
+                    requestManager.logError("Duplicate Metadata found for method %1s. Consider making a List or Map", elementName);
+                }
                 metaDataParamName = name;
             } else if (variableElement.getAnnotation(Part.class) != null) {
                 partMap.put(name, variableElement.getAnnotation(Part.class));

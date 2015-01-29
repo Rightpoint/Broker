@@ -38,4 +38,6 @@ public class Classes {
     public static final String PRIORITY = REQUEST_PACKAGE + ".core.Priority";
 
     public static final String REQUEST_CONFIG = REQUEST_PACKAGE + ".RequestConfig";
+
+    public static final String VOID = void.class.getCanonicalName();
 }

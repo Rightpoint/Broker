@@ -21,9 +21,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 
 /**
- * Author: andrewgrosner
- * Contributors: { }
- * Description:
+ * Description: Defines a {@link com.raizlabs.android.broker.core.RestService} annotation.
  */
 public class RestServiceDefinition extends BaseDefinition {
 
@@ -61,14 +59,13 @@ public class RestServiceDefinition extends BaseDefinition {
             requestExecutorClass = RequestExecutor.class.getCanonicalName();
         }
 
-        restMethodDefinitions = new ArrayList<RestMethodDefinition>();
+        restMethodDefinitions = new ArrayList<>();
         List<? extends Element> elements = typeElement.getEnclosedElements();
         for (Element element : elements) {
             if (element.getAnnotation(Method.class) != null) {
                 restMethodDefinitions.add(new RestMethodDefinition(requestManager, element));
             }
         }
-
 
         List<? extends TypeMirror> interfaces = requestManager.getElements().getTypeElement(getFQCN()).getInterfaces();
         if (!interfaces.isEmpty()) {
