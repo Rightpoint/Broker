@@ -28,6 +28,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 
@@ -104,11 +105,8 @@ public class RestMethodDefinition implements Definition {
                         || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.REQUEST_BUILDER, returnType);
             }
 
-            if(!returnsRequest && !returnsRequestBuilder) {
-                returnsVoid = RequestUtils.implementsClassSuper(types, requestManager.getDeclaredType(Classes.VOID), returnType)
-                        || RequestUtils.implementsClass(requestManager.getProcessingEnvironment(), Classes.VOID, returnType);
-            }
-
+        } else if (element.getReturnType().getKind().equals(TypeKind.VOID)) {
+            returnsVoid = true;
         }
 
         elementName = element.getSimpleName().toString();
@@ -177,7 +175,7 @@ public class RestMethodDefinition implements Definition {
                 Header header = variableElement.getAnnotation(Header.class);
                 this.headers.put(header.value(), name);
             } else if (variableElement.getAnnotation(Body.class) != null) {
-                if(!body.isEmpty()) {
+                if(body != null && !body.isEmpty()) {
                     requestManager.logError("Duplicate Body found for method %1s.", elementName);
                 }
                 body = name;
@@ -185,7 +183,7 @@ public class RestMethodDefinition implements Definition {
                 Param param = variableElement.getAnnotation(Param.class);
                 urlParams.put(name, param);
             } else if (variableElement.getAnnotation(Metadata.class) != null) {
-                if(!metaDataParamName.isEmpty()) {
+                if(metaDataParamName != null && !metaDataParamName.isEmpty()) {
                     requestManager.logError("Duplicate Metadata found for method %1s. Consider making a List or Map", elementName);
                 }
                 metaDataParamName = name;
