@@ -6,72 +6,65 @@ A façade between executing requests and creating them. The library provides a w
 
 ## Getting Started
 
-### Remotely
+Add the maven repo url to your root build.gradle in the ```buildscript{}``` and ```allProjects{}``` blocks:
 
-Add the repo as a maven url to your classpath:
-
-```
-
-buildscript {
-      repositories {
+```groovy
+  buildscript {
+    repositories {
         maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
-      }
-}
+    }
+    classpath 'com.raizlabs:Griddle:1.0.0'
+    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+  }
+  
+  allprojects {
+    repositories {
+        maven { url "https://raw.github.com/Raizlabs/maven-releases/master/releases" }
+    }
+  }
+
 
 ```
 
-Add this line to your build.gradle, using the [apt plugin](https://bitbucket.org/hvisser/android-apt) and the 
-[AARLinkSources](https://github.com/xujiaao/AARLinkSources) plugin:
+Add the library to the project-level build.gradle, using the [apt plugin](https://bitbucket.org/hvisser/android-apt) and the 
+[Griddle](https://github.com/Raizlabs/Griddle) plugin:
 
 ```groovy
 
-dependencies {
-  apt 'com.raizlabs.android:Broker-Compiler:1.1.0'
-  aarLinkSources 'com.raizlabs.android:Broker-Compiler:1.1.0:sources@jar'
-  compile 'com.raizlabs.android:Broker-Core:1.1.0'
-  aarLinkSources 'com.raizlabs.android:Broker-Core:1.1.0:sources@jar'
-  compile 'com.raizlabs.android:Broker: 1.1.0'
-  aarLinkSources 'com.raizlabs.android:Broker:1.1.0:sources@jar'
+  apply plugin: 'com.neenbedankt.android-apt'
+  apply plugin: 'com.raizlabs.griddle'
 
-}
-
+  dependencies {
+    apt 'com.raizlabs.android:Broker-Compiler:1.1.0'
+    mod "com.raizlabs.android:{Broker-Core, Broker}:1.1.0"
+  }
 
 ```
 
 #### Volley Support
 
-To use the provided ```VolleyExecutor```, add these lines:
+To use the provided ```VolleyExecutor```, add ```Broker-Volley``` to the ```{}``` enclosure from the main section.
 
-```java
-
-      compile 'com.raizlabs.android:Broker-Volley:1.1.0'
-      aarLinkSources 'com.raizlabs.android:Broker-Volley:1.1.0:sources@jar'
-
-```
 
 #### WebServiceManager
 
-To use ```WebServiceManager``` ([repo](https://github.com/Raizlabs/RZAndroidWebServiceManager)), add these lines:
-
-```java
-
-      compile 'com.raizlabs.android:Broker-WebServiceManager:1.1.0'
-      aarLinkSources 'com.raizlabs.android:Broker-WebServiceManager:1.1.0:sources@jar'
-
-```
+To use ```WebServiceManager``` ([repo](https://github.com/Raizlabs/RZAndroidWebServiceManager)), add ```Broker-WebServiceManager``` to the ```{}``` enclosure from the main section.
 
 ### Locally: 
 
-Add the ```request_project_prefix``` to your ```gradle.properties``` file, to elminate the need to fork and change the build.gradle of the project.
+Add the ```request_project_prefix``` to your ```gradle.properties``` file and set to ```Broker```, to elminate the need to fork and change the build.gradle of the project.
 
-Add these lines to your build.gradle:
+Add the includes in settings.gradle:
+
+include ':Libraries:Broker:Broker-Compiler', ':Libraries:Broker:Broker-Core', ':Libraries:Broker:Broker'
+
+Change your ```dependences{}``` from build.gradle to:
 
 ```groovy
 
   dependencies {
-    apt project(request_project_prefix + "Broker-Compiler")
-    compile project(request_project_prefix + "Broker-Core")
-    compile project(request_project_prefix + "Broker")
+    mod "com.raizlabs.android: {{Broker-Compiler, local: ${request_project_prefix}Broker-Compiler}}:1.1.0")
+    mod "com.raizlabs.android:{{Broker-Core, local: ${request_project_prefix}Broker-Core}, {Broker, local: ${request_project_prefix}Broker}:1.1.0"
   }
 
 ```
